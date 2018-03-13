@@ -75,6 +75,7 @@ class merkleKit():
 		return proof
 
 	def check_proof(self, msg, proof):
+		msg = self.to_hex(msg)
 		msg_hash = self.get_hash(msg)
 		root_hash = self.get_root_node()
 
@@ -116,11 +117,11 @@ class merkleKit():
 
 			for i in range(0, total, 2):
 				if (i + 1 < total):
-					concatenated_hash = self.levels[level - 1][i] + self.levels[level - 1][i]
-					# print(i, '-->', concatenated_hash)
+					concatenated_hash = self.levels[level - 1][i] + self.levels[level - 1][i + 1]
+					print(i, '-->', concatenated_hash)
 					self.levels[level].append(self.get_hash(concatenated_hash))
 				else:
-					# print(i, '-->', self.levels[level - 1][i])
+					print(i, '-->', self.levels[level - 1][i])
 					self.levels[level].append(self.levels[level - 1][i])
 			
 			total = len(self.levels[level])
@@ -164,4 +165,4 @@ print(14, mt.get_proof(14))
 print(15, mt.get_proof(15))
 print(16, mt.get_proof(16))
 print('\ncheck proof\n')
-print(mt.check_proof('Aditya', [{'045b61fa0ff73b2d265446228ea0dba753bfd652ca8a165737d604961f7d7ef8': 'right'}, {'70b6b35f0778664d7c5c1b697b54cddadbd49a77f83137a365de4c3d33eb113d': 'right'}, {'7a2901dd05a8421da242492c094b92578b435d6b76e9d7cacd2307ad60d24752': 'right'}, {'d9ae83f50466922a14955cc58a84771641c077b32eaa4de2bd5d83ee294a8fd8': 'right'}]))
+print(mt.check_proof('Aditya', [{'045b61fa0ff73b2d265446228ea0dba753bfd652ca8a165737d604961f7d7ef8': 'right'}, {'d7917a0100dea16b00829a0b7eff56ab64fc2990f907377fba8da557fb765d3f': 'right'}, {'b0930eebf92d053c3d72bb92e66fb320060ec17ef7af8386f9ef08ae1eae163d': 'right'}, {'a0cf5adfdf5d8ce7e40011303fe4e5c9a21f3b8847e760a65c91e8ee4bb6407d': 'right'}]))

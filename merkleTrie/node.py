@@ -1,3 +1,5 @@
+from utils import Util
+
 BRANCH_NODE = 0
 LINK_NODE = 1
 DATA_NODE = 2
@@ -21,10 +23,10 @@ class BranchNode(Node):
         concated = ''
         for a_child in self.children:
             if a_child is not None:
-                if a_child.get_hash() is None:
+                if a_child.get_hash is None:
                     a_child.calculate_hash()
-                concated += a_child.get_hash()
-        self.hash = utils.get_hash_from_string(concated)
+                concated += a_child.get_hash
+        self.hash = Util.get_hash(concated)
 
 
 class LinkNode(Node):
@@ -47,12 +49,5 @@ class DataNode(Node):
         self.type = DATA_NODE
 
     def calculate_hash(self):
-        self.hash = self._get_hash(self._to_hex(self.data))
+        self.hash = Util.get_hash(self.data)
 
-	def _to_hex(self, inp):
-		str_inp = str(inp)
-		str_inp = str_inp.encode('utf-8')
-		return bytearray(str_inp).hex()
-
-	def _get_hash(self, inp):
-		inp = inp.enc

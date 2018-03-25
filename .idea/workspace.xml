@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="4e3df35a-315c-4a01-86f4-96e01b6b5463" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/merkleTrie/merkleKit.py" afterPath="$PROJECT_DIR$/merkleTrie/merkleKit.py" />
-      <change beforePath="$PROJECT_DIR$/merkleTrie/node.py" afterPath="$PROJECT_DIR$/merkleTrie/node.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -37,8 +36,8 @@
       <file leaf-file-name="merkleKit.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/merkleTrie/merkleKit.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="450">
-              <caret line="58" column="21" lean-forward="true" selection-start-line="58" selection-start-column="21" selection-end-line="58" selection-end-column="21" />
+            <state relative-caret-position="460">
+              <caret line="63" column="0" lean-forward="true" selection-start-line="60" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -214,8 +213,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/merkleTrie/merkleKit.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="58" column="21" lean-forward="true" selection-start-line="58" selection-start-column="21" selection-end-line="58" selection-end-column="21" />
+        <state relative-caret-position="460">
+          <caret line="63" column="0" lean-forward="true" selection-start-line="60" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
           </folding>

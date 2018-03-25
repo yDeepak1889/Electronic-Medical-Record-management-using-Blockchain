@@ -51,13 +51,16 @@ class MerkleTrie:
 			return
 		print(node.get_hash)
 		print(lvl)
-		print(node.children)
+		if node.type is BRANCH_NODE:
+			print(node.children)
+		elif node.type is DATA_NODE:
+			print(node.data)
+			return
 		lvl += 1
 
-		while node:
-			for i in node.children:
-				if i:
-					self.show_trie(i, lvl)
+		for i in node.children:
+			if i:
+				self.show_trie(i, lvl)
 
 class merkleKit():
 	

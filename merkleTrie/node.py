@@ -15,7 +15,7 @@ class Node:
 
 class BranchNode(Node):
     def __init__(self):
-        super().__init__(self)
+        super().__init__()
         self.children = [None] * 16
         self.type = BRANCH_NODE
 
@@ -25,13 +25,12 @@ class BranchNode(Node):
             if a_child is not None:
                 if a_child.get_hash is None:
                     a_child.calculate_hash()
-                concated += a_child.get_hash
+                concated += a_child.get_hash()
         self.hash = Util.get_hash(concated)
 
-
 class LinkNode(Node):
-    def __init__(self, block_number, addr):
-        super().__init__(self)
+    def __init__(self, block_number, addr, hash):
+        super().__init__()
         self.blockNumber = block_number
         self.addr = addr
         self.hash = calculate_hash(self)
@@ -44,7 +43,7 @@ class LinkNode(Node):
 
 class DataNode(Node):
     def __init__(self):
-        super().__init__(self)
+        super().__init__()
         self.data = None
         self.type = DATA_NODE
 

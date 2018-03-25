@@ -1,25 +1,63 @@
 import hashlib
 from node import *
 
-class merkleTrie:
+class MerkleTrie:
 
 	def __init__(self):
 		self.root_hash = None
 		self.is_ready = False
 		self.root_node = None
 
-		@property
-		def get_root_hash(self):
-			return self.root_hash
+	@property
+	def get_root_hash(self):
+		return self.root_hash
 
-		@property
-		def get_is_ready(self):
-			return self.is_ready
+	@property
+	def get_is_ready(self):
+		return self.is_ready
 
-		def insert_hash(self, hash):
+	def insert_hash(self, hash):
+		self.is_ready = False
+		if not self.root_node:
+			self.root_node = BranchNode()
+		return self._helper_insert_hash(self.root_node, hash)
 
+	def _helper_insert_hash(self, node, hash):
+		index = int(hash[0])
+		if not node.children[index]:
+			if len(hash) is 1:
+				if node.children[index]:
+					print('hash already exists')
+					return False
+				node.children[index] = DataNode()
+				return True
+			else:
+				if node.children[index]:
+					return self._helper_insert_hash(node.children[index], hash[1:])
+				else:
+					node.children[index] = BranchNode()
+					return self._helper_insert_hash(node.children[index], hash[1:])
 
-		def _helper_insert_hash(self, hash):
+	def calculate_hash(self):
+		self.root_node.calculte_hash()
+		self.root_hash = self.root_node.get_hash()
+		self.is_ready = True
+		return self.root_hash
+
+	def show_trie(self, node, lvl):
+		print(node)
+		if node is None:
+			print('passed node is null')
+			return
+		print(node.get_hash)
+		print(lvl)
+		print(node.children)
+		lvl += 1
+
+		while node:
+			for i in node.children:
+				if i:
+					self.show_trie(i, lvl)
 
 class merkleKit():
 	

@@ -11,7 +11,7 @@ class Node:
 
     @property
     def get_hash(self):
-        return self.hash;
+        return self.hash
 
 class BranchNode(Node):
     def __init__(self):

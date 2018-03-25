@@ -1,16 +1,25 @@
 import hashlib
-import pprint
+from node import *
 
-# ******* Alternate approach, create nodes as this structure
-# yup we are following this now
+class merkleTrie:
 
-# class node():
-# 	"""node in a merkle tree"""
-# 	def __init__(self):
-# 		self.hash = None
-# 		self.left = None
-# 		self.right = None
-		
+	def __init__(self):
+		self.root_hash = None
+		self.is_ready = False
+		self.root_node = None
+
+		@property
+		def get_root_hash(self):
+			return self.root_hash
+
+		@property
+		def get_is_ready(self):
+			return self.is_ready
+
+		def insert_hash(self, hash):
+
+
+		def _helper_insert_hash(self, hash):
 
 class merkleKit():
 	

@@ -25,7 +25,7 @@ class BranchNode(Node):
             if a_child is not None:
                 if a_child.get_hash is None:
                     a_child.calculate_hash()
-                concated += a_child.get_hash()
+                concated += a_child.get_hash
         self.hash = Util.get_hash(concated)
 
 class LinkNode(Node):
@@ -50,3 +50,5 @@ class DataNode(Node):
     def calculate_hash(self):
         self.hash = Util.get_hash(self.data)
 
+    def set_data(self, data):
+        self.data = data

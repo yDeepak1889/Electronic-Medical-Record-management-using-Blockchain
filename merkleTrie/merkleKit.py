@@ -16,31 +16,33 @@ class MerkleTrie:
 	def get_is_ready(self):
 		return self.is_ready
 
-	def insert_hash(self, hash):
+	def insert_hash(self, hash, data=None):
 		self.is_ready = False
 		if not self.root_node:
 			self.root_node = BranchNode()
-		return self._helper_insert_hash(self.root_node, hash)
+		data_node =  self._helper_insert_hash(self.root_node, hash)
+		data_node.set_data(data)
+		print('data, ', data, ' inserted at location ', hash)
 
 	def _helper_insert_hash(self, node, hash):
 		index = int(hash[0])
-		if not node.children[index]:
-			if len(hash) is 1:
-				if node.children[index]:
-					print('hash already exists')
-					return False
-				node.children[index] = DataNode()
-				return True
+
+		if len(hash) is 1:
+			if node.children[index]:
+				print('hash already exists, not possible to reenter')
+				return False
+			node.children[index] = DataNode()
+			return node.children[index]
+		else:
+			if node.children[index]:
+				return self._helper_insert_hash(node.children[index], hash[1:])
 			else:
-				if node.children[index]:
-					return self._helper_insert_hash(node.children[index], hash[1:])
-				else:
-					node.children[index] = BranchNode()
-					return self._helper_insert_hash(node.children[index], hash[1:])
+				node.children[index] = BranchNode()
+				return self._helper_insert_hash(node.children[index], hash[1:])
 
 	def calculate_hash(self):
-		self.root_node.calculte_hash()
-		self.root_hash = self.root_node.get_hash()
+		self.root_node.calculate_hash()
+		self.root_hash = self.root_node.get_hash
 		self.is_ready = True
 		return self.root_hash
 
@@ -61,6 +63,8 @@ class MerkleTrie:
 		for i in node.children:
 			if i:
 				self.show_trie(i, lvl)
+	
+	def initiate_copy
 
 class merkleKit():
 	

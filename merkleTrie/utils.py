@@ -11,4 +11,4 @@ class Util:
 		return str(hashlib.sha256(inp).hexdigest())
 
 	def get_hash(inp):
-		return _hex_hash(_to_hex(inp))
+		return Util._hex_hash(Util._to_hex(inp))

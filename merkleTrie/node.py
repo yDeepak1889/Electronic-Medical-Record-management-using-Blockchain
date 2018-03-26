@@ -33,7 +33,7 @@ class LinkNode(Node):
         super().__init__()
         self.blockNumber = block_number
         self.addr = addr
-        self.hash = calculate_hash(self)
+        self.hash = hash
         self.type = LINK_NODE
 
     def calculate_hash(self):

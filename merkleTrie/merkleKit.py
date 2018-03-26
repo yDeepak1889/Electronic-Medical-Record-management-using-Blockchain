@@ -27,6 +27,18 @@ class MerkleTrie:
 	def _helper_insert_hash(self, node, hash):
 		index = int(hash[0])
 
+		if node.type is LINK_NODE:
+			# we need to bring in data from the reference and transform
+			# this link_node to branch_node, also we need to make sure that
+			# the children of the branch node are link node nd point to the apt location
+			temp_node = BranchNode()
+			# write this function to retrive a node using node.blockNumber and node.addr
+			current_reference = retrieve(node)
+			for ind, a_child in enumerate(current_reference.children):
+				if a_child:
+					temp_node.children[ind] = LinkNode()
+					# reference this temp_node to the original reference.
+			pass
 		if len(hash) is 1:
 			if node.children[index]:
 				print('hash already exists, not possible to reenter')
@@ -63,8 +75,15 @@ class MerkleTrie:
 		for i in node.children:
 			if i:
 				self.show_trie(i, lvl)
-	
-	def initiate_copy
+
+	def initiate_copy(self, old, index=0):
+		# index should actually contain the block number for reference
+		for cnt in self.children:
+			self.children[cnt] = LinkNode(index, cnt, old.children[cnt].hash)
+
+	def linking(self):
+		pass
+
 
 class merkleKit():
 	

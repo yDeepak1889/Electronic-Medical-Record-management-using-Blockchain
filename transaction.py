@@ -25,7 +25,3 @@ class keyInclusionTransaction(object):
 
 if __name__ == '__main__':
     ojb = grantRevokeTransaction()
-
-
-
-

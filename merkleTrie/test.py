@@ -12,4 +12,3 @@ mt1.insert_hash('455789', {'greetings':'hello'})
 
 mt2.initiate_copy(mt1)
 mt.show_trie(mt.root_node, 0)
-

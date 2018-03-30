@@ -1,58 +1,48 @@
+from nodes import *
+from utils import *
 import hashlib
 import json
-
-def get_hash(inp):
-		inp = inp.encode('utf-8')
-		return str(hashlib.sha256(inp).hexdigest())
-
-class innerNode:
-	def __init__(self):
-		self.next = [None] * 16
-		self.hash = None
-
-class leafNode:
-	def __init__(self):
-		self.data = {}
-		self.hash = None
-
 
 class StateTrie:
 	def __init__(self):
 		self.root = None
-	
 
-	def getIndex (self, ch) :
-		if ord(ch) >= ord('a') and ord(ch) <= ord('f'):
-			curPos = (ord(ch) - ord('a')) + 10
-		else:
-			curPos = ord(ch) - ord('0')
 
-		return curPos
+	def _populateWithPreviousNext (self, previousTrie = None, root = None):
+		if previousTrie != None:
+			for i in range(16):
+				root.next[i] = previousTrie.next[i]
+		return
+
+	def updateHash (self, root = None):
+		if not root:
+			return 
+
+		nodeHash = ""
+		for i in range(16):
+			if root.next[i]:
+				nodeHash = Util.get_hash(nodeHash + root.next[i].hash)
+		root.hash = nodeHash
+		return
 
 
 	def traverseTrie (self, addr, data, previousTrie = None, root = None):
 		if len(addr) == 1:
-			indx = self.getIndex(addr[0])
+			indx = Util.getIndex(addr[0])
 			
-			if previousTrie != None:
-				for i in range(16):
-					root.next[i] = previousTrie.next[i]
+			self._populateWithPreviousNext(previousTrie, root)
 			
 			root.next[indx] = leafNode()
 			root.next[indx].data = data['data']
-			root.next[indx].hash = get_hash(json.dumps(data))
-			nodeHash = ""
-			for i in range(16):
-				if root.next[i]:
-					nodeHash = get_hash(nodeHash + root.next[i].hash)
-			root.hash = nodeHash
+			root.next[indx].hash = Util.get_hash(json.dumps(data))
+			
+			self.updateHash (root)
+
 			return
 
-		if previousTrie != None:
-			for i in range(16):
-				root.next[i] = previousTrie.next[i]
+		self._populateWithPreviousNext(previousTrie, root)
 
-		indx = self.getIndex(addr[0])
+		indx = Util.getIndex(addr[0])
 		print ("New Node Created")
 		root.next[indx] = innerNode()
 
@@ -61,12 +51,9 @@ class StateTrie:
 		else:
 			self.traverseTrie(addr[1:], data, previousTrie.next[indx], root.next[indx])
 
-		nodeHash = ""
-		for i in range(16):
-			if root.next[i]:
-				nodeHash = get_hash(nodeHash + root.next[i].hash)
+		self.updateHash (root)
 
-		root.hash = nodeHash
+		return
 
 
 	def updateForT (self, t, previousTrie = None, root = None):
@@ -93,79 +80,78 @@ class StateTrie:
 		if not addr:
 			return root.data
 
-		indx = self.getIndex(addr[0])
+		indx = Util.getIndex(addr[0])
 		return self.getData(addr[1:], root.next[indx])
 
+
+
 trieRoot = StateTrie()
+
 tran1 = {
-	'to': get_hash('abcdefgh1234')[:20],
-	'from': get_hash('abcdefgh1234')[:20],
+	'to': Util.get_hash('abcdefgh1234')[:20],
+	'from': Util.get_hash('abcdefgh1234')[:20],
 	'data': "This is a test data1"
 }
 
 
 tran2 = {
-	'to': get_hash('abcdefgh12345')[:20],
-	'from': get_hash('abcdefgh1234')[:20],
+	'to': Util.get_hash('abcdefgh12345')[:20],
+	'from': Util.get_hash('abcdefgh1234')[:20],
 	'data': "This is a test data2"
 }
 tran3 = {
-	'to': get_hash('abcdefgh12346')[:20],
-	'from': get_hash('abcdefgh1234')[:20],
+	'to': Util.get_hash('abcdefgh12346')[:20],
+	'from': Util.get_hash('abcdefgh1234')[:20],
 	'data': "This is a test data3"
 }
 tran4 = {
-	'to': get_hash('abcdefgh12347')[:20],
-	'from': get_hash('abcdefgh1234')[:20],
+	'to': Util.get_hash('abcdefgh12347')[:20],
+	'from': Util.get_hash('abcdefgh1234')[:20],
 	'data': "This is a test data4"
 }
 tran5 = {
-	'to': get_hash('abcdefgh12348')[:20],
-	'from': get_hash('abcdefgh1234')[:20],
+	'to': Util.get_hash('abcdefgh12348')[:20],
+	'from': Util.get_hash('abcdefgh1234')[:20],
 	'data': "This is a test data5"
 }
 
 trans = [tran1, tran2, tran3, tran4, tran5]
-
 root = trieRoot.updateForAllTrans (trans)
 
 print(root.hash)
-
 print (trieRoot.getData(tran3['to'], root))
 
 
 
 trieRoot1 = StateTrie()
+
 tran11 = {
-	'to': get_hash('abcdefgh12341')[:20],
-	'from': get_hash('abcdefgh1234')[:20],
+	'to': Util.get_hash('abcdefgh12341')[:20],
+	'from': Util.get_hash('abcdefgh1234')[:20],
 	'data': "This is a test data11"
 }
-
-
 tran21 = {
-	'to': get_hash('abcdefgh12345')[:20],
-	'from': get_hash('abcdefgh1234')[:20],
+	'to': Util.get_hash('abcdefgh12345')[:20],
+	'from': Util.get_hash('abcdefgh1234')[:20],
 	'data': "This is a test data21"
 }
 tran31 = {
-	'to': get_hash('abcdefgh12346')[:20],
-	'from': get_hash('abcdefgh1234')[:20],
+	'to': Util.get_hash('abcdefgh12346')[:20],
+	'from': Util.get_hash('abcdefgh1234')[:20],
 	'data': "This is a test data31"
 }
 tran41 = {
-	'to': get_hash('abcdefgh12347')[:20],
-	'from': get_hash('abcdefgh1234')[:20],
+	'to': Util.get_hash('abcdefgh12347')[:20],
+	'from': Util.get_hash('abcdefgh1234')[:20],
 	'data': "This is a test data41"
 }
 tran51 = {
-	'to': get_hash('abcdefgh12348')[:20],
-	'from': get_hash('abcdefgh1234')[:20],
+	'to': Util.get_hash('abcdefgh12348')[:20],
+	'from': Util.get_hash('abcdefgh1234')[:20],
 	'data': "This is a test data51"
 }
 
 trans = [tran11]
-
 root1 = trieRoot1.updateForAllTrans (trans, trieRoot.root)
 
 print(root1.hash)

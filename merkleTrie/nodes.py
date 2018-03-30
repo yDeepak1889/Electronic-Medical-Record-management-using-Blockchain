@@ -7,5 +7,5 @@ class innerNode:
 
 class leafNode:
 	def __init__(self):
-		self.data = {}
+		self.data = None
 		self.hash = None

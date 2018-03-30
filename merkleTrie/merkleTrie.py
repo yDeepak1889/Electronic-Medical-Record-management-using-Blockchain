@@ -1,5 +1,5 @@
-from nodes import *
-from utils import Util
+from merkleTrie.nodes import *
+from merkleTrie.utils import Util
 import json
 
 
@@ -51,7 +51,7 @@ class MerkleTrie:
 			return
 
 		tranID = t['to']
-		self.traverseTrie(tranID, t, root)
+		self.traverseTrie(tranID, t['amount'], root)
 
 
 	def updateForAllTrans(self, trans):
@@ -71,36 +71,36 @@ class MerkleTrie:
 		indx = Util.getIndex(addr[0])
 		return self.getData(addr[1:], root.next[indx])
 
-
+'''
 
 trieRoot = MerkleTrie()
 
 tran1 = {
 	'to': Util.get_hash('abcdefgh1234')[:20],
 	'from': Util.get_hash('abcdefgh1234')[:20],
-	'data': "This is a test data1"
+	'amount': "This is a test amount1"
 }
 
 
 tran2 = {
 	'to': Util.get_hash('abcdefgh12345')[:20],
 	'from': Util.get_hash('abcdefgh1234')[:20],
-	'data': "This is a test data2"
+	'amount': "This is a test amount2"
 }
 tran3 = {
 	'to': Util.get_hash('abcdefgh12346')[:20],
 	'from': Util.get_hash('abcdefgh1234')[:20],
-	'data': "This is a test data3"
+	'amount': "This is a test amount3"
 }
 tran4 = {
 	'to': Util.get_hash('abcdefgh12347')[:20],
 	'from': Util.get_hash('abcdefgh1234')[:20],
-	'data': "This is a test data4"
+	'amount': "This is a test amount4"
 }
 tran5 = {
 	'to': Util.get_hash('abcdefgh12348')[:20],
 	'from': Util.get_hash('abcdefgh1234')[:20],
-	'data': "This is a test data5"
+	'amount': "This is a test amount5"
 }
 
 trans = [tran1, tran2, tran3, tran4, tran5]
@@ -108,3 +108,4 @@ root = trieRoot.updateForAllTrans (Util.sortItemBytransID(trans))
 
 print(root.hash)
 print (trieRoot.getData(tran3['to'], root))
+'''

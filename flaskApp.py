@@ -1,4 +1,7 @@
 from blockchain import Blockchain
+from flask import Flask, jsonify, request
+from uuid import uuid4
+
 
 app = Flask(__name__)
 nodeIdentifier = str(uuid4()).replace('-', '')
@@ -8,27 +11,25 @@ blockchain = Blockchain()
 
 @app.route('/mine', methods=['GET'])
 def mine():
-    last_block = Blockchain.lastBlock
-    lastProof = last_block['proof']
-    proof = Blockchain.proofOfWork(lastProof)
+    last_block = blockchain.lastBlock
+    lastProof = last_block[0]['proof']
+    proof = blockchain.proofOfWork(lastProof)
+    previousHash = blockchain.hash(last_block[0])
+    block = blockchain.newBlock(proof, previousHash)
 
-    Blockchain.newTransaction(
-        sender="0",
-        recipient=nodeIdentifier,
-        amount=1
+    if block:
+        response = {
+            'message': "New Block Forged",
+            'index': block[0]['index'],
+            'transaction': block[0]['transactions'],
+            'proof': block[0]['proof'],
+            'previousHash': previousHash
+        }
+    else :
+        response = {
+            'message' : 'Empty transaction pool'
+        }
 
-    )
-
-    previousHash = Blockchain.hash(last_block)
-    block = Blockchain.newBlock(proof, previousHash)
-
-    response = {
-        'message': "New Block Forged",
-        'index': block['index'],
-        'transaction': block['transactions'],
-        'proof': block['proof'],
-        'previousHash': previousHash
-    }
     return jsonify(response), 200
 
 
@@ -41,7 +42,7 @@ def newTransaction():
     if not all(k in values for k in required):
         return "Missing values", 400
 
-    index = Blockchain.newTransaction(values['sender'], values['recipient'], values['amount'])
+    index = blockchain.newTransaction(values['sender'], values['recipient'], values['amount'])
 
     response = {'message': str('Transaction will be added to Block ' + str(index))}
 
@@ -50,9 +51,14 @@ def newTransaction():
 
 @app.route('/chain', methods=['GET'])
 def fullChain():
+
+    fullChainArr = []
+    for block in blockchain.chain:
+        fullChainArr.append(block[0])
+
     response = {
-        'chain': Blockchain.chain,
-        'length': len(Blockchain.chain)
+        'chain': fullChainArr,
+        'length': len(fullChainArr)
     }
     return jsonify(response), 200
 
@@ -67,12 +73,12 @@ def registerNodes():
         return "Error: Please supply a valid list of nodes", 400
 
     for node in nodes:
-        Blockchain.registerNode(node)
+        blockchain.registerNode(node)
 
     response = {
         'message': 'New nodes have been added',
-        'length': len(Blockchain.nodes),
-        'total_nodes': list(Blockchain.nodes)
+        'length': len(blockchain.nodes),
+        'total_nodes': list(blockchain.nodes)
     }
 
     return jsonify(response), 201
@@ -80,18 +86,18 @@ def registerNodes():
 
 @app.route('/nodes/resolve', methods=['GET'])
 def consensus():
-    replaced = Blockchain.resolveConflicts()
+    replaced = blockchain.resolveConflicts()
 
     if replaced:
         response = {
             'message': 'Your chain was replaced',
-            'new_chain': Blockchain.chain
+            'new_chain': blockchain.chain
         }
 
     else:
         response = {
             'message': 'Your chain is authoritative',
-            'chain': Blockchain.chain
+            'chain': blockchain.chain
         }
     return jsonify(response), 200
 

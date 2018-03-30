@@ -5,7 +5,9 @@ from uuid import uuid4
 from flask import Flask, jsonify, request
 import json
 import hashlib
-
+from merkleTrie.stateTrie import *
+from merkleTrie.merkleTrie import *
+from merkleTrie.utils import *
 
 class Blockchain(object):
     def __init__(self):
@@ -26,18 +28,38 @@ class Blockchain(object):
             raise ValueError('Invalid URL')
 
     def newBlock(self, proof, previousHash=None):
+
+        if len(self.currentTransaction) == 0 and len(self.chain) > 0:
+            #rint (len(self.chain))
+            #print ('Booom')
+            return None
+
+        stateTrie = StateTrie()
+        merkleTrie = MerkleTrie() 
+        merkleRoot = merkleTrie.updateForAllTrans (self.currentTransaction)
+        
         if len(self.chain) == 0:
             preH = previousHash
+            stateTrieRoot = stateTrie.updateForAllTrans (self.currentTransaction)
         else:
-            preH = self.hash(self.chain[-1])
+            preH = self.hash(self.chain[-1][0])
+            stateTrieRoot = stateTrie.updateForAllTrans (self.currentTransaction, self.chain[-1][1]['stateTrieRoot'])
 
-        block = {
-            'index': len(self.chain) + 1,
+        block = [
+            {'index': len(self.chain) + 1,
             'timestamp': time(),
             'transactions': self.currentTransaction,
             'proof': proof,
-            'previousHash': preH
-        }
+            'previousHash': preH,
+            'stateTrieHash': stateTrieRoot.hash,
+            'merkleRootHash': merkleRoot.hash
+            },
+            
+            {
+            'stateTrieRoot': stateTrieRoot,
+            'merkleTrieRoot': merkleRoot
+            }
+        ]
 
         self.currentTransaction = []
         self.chain.append(block)
@@ -45,11 +67,11 @@ class Blockchain(object):
 
     def newTransaction(self, sender, recipient, amount):
         self.currentTransaction.append({
-            'sender': sender,
-            'recipient': recipient,
+            'from': sender,
+            'to': recipient,
             'amount': amount
         })
-        return self.lastBlock['index'] + 1
+        return self.lastBlock[0]['index'] + 1
 
     @staticmethod
     def hash(block):
@@ -58,7 +80,6 @@ class Blockchain(object):
 
     @property
     def lastBlock(self):
-
         return self.chain[-1]
 
     def proofOfWork(self, lastProof):
@@ -75,11 +96,11 @@ class Blockchain(object):
         return guessHash[:4] == "0000"
 
     def validChain (self, chain):
-        lastBlock = chain[0]
+        lastBlock = chain[0][0]
         currentIndex = 1
 
         while currentIndex < len(chain):
-            block = chain[currentIndex]
+            block = chain[currentIndex][0]
 
             if block['previousHash'] != self.hash(lastBlock):
                 return False

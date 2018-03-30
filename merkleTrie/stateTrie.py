@@ -1,5 +1,5 @@
-from nodes import *
-from utils import *
+from merkleTrie.nodes import *
+from merkleTrie.utils import *
 import hashlib
 import json
 
@@ -33,7 +33,7 @@ class StateTrie:
 			self._populateWithPreviousNext(previousTrie, root)
 			
 			root.next[indx] = leafNode()
-			root.next[indx].data = data['data']
+			root.next[indx].data = data['amount']
 			root.next[indx].hash = Util.get_hash(json.dumps(data))
 			
 			self.updateHash (root)
@@ -43,7 +43,7 @@ class StateTrie:
 		self._populateWithPreviousNext(previousTrie, root)
 
 		indx = Util.getIndex(addr[0])
-		print ("New Node Created")
+		#print ("New Node Created")
 		root.next[indx] = innerNode()
 
 		if not previousTrie:
@@ -83,36 +83,36 @@ class StateTrie:
 		indx = Util.getIndex(addr[0])
 		return self.getData(addr[1:], root.next[indx])
 
-
+'''
 
 trieRoot = StateTrie()
 
 tran1 = {
 	'to': Util.get_hash('abcdefgh1234')[:20],
 	'from': Util.get_hash('abcdefgh1234')[:20],
-	'data': "This is a test data1"
+	'amount': "This is a test amount1"
 }
 
 
 tran2 = {
 	'to': Util.get_hash('abcdefgh12345')[:20],
 	'from': Util.get_hash('abcdefgh1234')[:20],
-	'data': "This is a test data2"
+	'amount': "This is a test amount2"
 }
 tran3 = {
 	'to': Util.get_hash('abcdefgh12346')[:20],
 	'from': Util.get_hash('abcdefgh1234')[:20],
-	'data': "This is a test data3"
+	'amount': "This is a test amount3"
 }
 tran4 = {
 	'to': Util.get_hash('abcdefgh12347')[:20],
 	'from': Util.get_hash('abcdefgh1234')[:20],
-	'data': "This is a test data4"
+	'amount': "This is a test amount4"
 }
 tran5 = {
 	'to': Util.get_hash('abcdefgh12348')[:20],
 	'from': Util.get_hash('abcdefgh1234')[:20],
-	'data': "This is a test data5"
+	'amount': "This is a test amount5"
 }
 
 trans = [tran1, tran2, tran3, tran4, tran5]
@@ -128,27 +128,27 @@ trieRoot1 = StateTrie()
 tran11 = {
 	'to': Util.get_hash('abcdefgh12341')[:20],
 	'from': Util.get_hash('abcdefgh1234')[:20],
-	'data': "This is a test data11"
+	'amount': "This is a test amount11"
 }
 tran21 = {
 	'to': Util.get_hash('abcdefgh12345')[:20],
 	'from': Util.get_hash('abcdefgh1234')[:20],
-	'data': "This is a test data21"
+	'amount': "This is a test amount21"
 }
 tran31 = {
 	'to': Util.get_hash('abcdefgh12346')[:20],
 	'from': Util.get_hash('abcdefgh1234')[:20],
-	'data': "This is a test data31"
+	'amount': "This is a test amount31"
 }
 tran41 = {
 	'to': Util.get_hash('abcdefgh12347')[:20],
 	'from': Util.get_hash('abcdefgh1234')[:20],
-	'data': "This is a test data41"
+	'amount': "This is a test amount41"
 }
 tran51 = {
 	'to': Util.get_hash('abcdefgh12348')[:20],
 	'from': Util.get_hash('abcdefgh1234')[:20],
-	'data': "This is a test data51"
+	'amount': "This is a test amount51"
 }
 
 trans = [tran11]
@@ -165,3 +165,4 @@ print (trieRoot1.getData(tran11['to'], root1))
 print (trieRoot1.getData(tran21['to'], root1))
 print (trieRoot1.getData(tran31['to'], root1))
 print (trieRoot.getData(tran41['to'], root1))
+'''

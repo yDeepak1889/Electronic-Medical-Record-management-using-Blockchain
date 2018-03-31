@@ -1,7 +1,7 @@
 from blockchain import Blockchain
 from flask import Flask, jsonify, request
 from uuid import uuid4
-
+from merkleTrie.stateTrie import StateTrie
 
 app = Flask(__name__)
 nodeIdentifier = str(uuid4()).replace('-', '')
@@ -99,6 +99,23 @@ def consensus():
             'message': 'Your chain is authoritative',
             'chain': blockchain.chain
         }
+    return jsonify(response), 200
+
+
+@app.route('/getBalance', methods=['POST'])
+def getBalance():
+    values = request.get_json()
+    addr = values.get('addr')
+    response = {
+        'balance': None
+    }
+    if len(blockchain.chain) < 2:
+        return jsonify(response), 201
+
+    #print(addr)
+    latestStateTrie = blockchain.lastBlock[1]['stateTrieRoot']
+    #print(latestStateTrie)
+    response['balance'] = StateTrie.getData(addr, latestStateTrie)
     return jsonify(response), 200
 
 

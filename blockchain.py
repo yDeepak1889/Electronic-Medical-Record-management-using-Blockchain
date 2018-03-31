@@ -45,14 +45,24 @@ class Blockchain(object):
             preH = self.hash(self.chain[-1][0])
             stateTrieRoot = stateTrie.updateForAllTrans (self.currentTransaction, self.chain[-1][1]['stateTrieRoot'])
 
+        if not stateTrieRoot:
+            stateHash = None
+        else:
+            stateHash = stateTrieRoot.hash
+
+        if not merkleRoot:
+            merkleHash = None
+        else:
+            merkleHash = merkleRoot.hash
+
         block = [
             {'index': len(self.chain) + 1,
             'timestamp': time(),
             'transactions': self.currentTransaction,
             'proof': proof,
             'previousHash': preH,
-            'stateTrieHash': stateTrieRoot.hash,
-            'merkleRootHash': merkleRoot.hash
+            'stateTrieHash': stateHash,
+            'merkleRootHash': merkleHash 
             },
             
             {

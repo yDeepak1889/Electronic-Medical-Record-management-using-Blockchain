@@ -82,7 +82,7 @@ class StateTrie:
 		#print(trans)
 		root = None
 		for t in trans:
-			root = updateForT(t, previousTrie)
+			root = StateTrie.updateForT(t, previousTrie)
 			previousTrie = root
 
 		return root

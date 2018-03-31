@@ -33,17 +33,16 @@ class Blockchain(object):
             #rint (len(self.chain))
             #print ('Booom')
             return None
-
-        stateTrie = StateTrie()
+        
         merkleTrie = MerkleTrie() 
         merkleRoot = merkleTrie.updateForAllTrans (self.currentTransaction)
         
         if len(self.chain) == 0:
             preH = previousHash
-            stateTrieRoot = stateTrie.updateForAllTrans (self.currentTransaction)
+            stateTrieRoot = StateTrie.updateForAllTrans (self.currentTransaction)
         else:
             preH = self.hash(self.chain[-1][0])
-            stateTrieRoot = stateTrie.updateForAllTrans (self.currentTransaction, self.chain[-1][1]['stateTrieRoot'])
+            stateTrieRoot = StateTrie.updateForAllTrans (self.currentTransaction, self.chain[-1][1]['stateTrieRoot'])
 
         if not stateTrieRoot:
             stateHash = None
@@ -139,6 +138,9 @@ class Blockchain(object):
 
         if newChain:
             self.chain = newChain
+            length = len(chain)
+            for i in range(1, length):
+                StateTrie.updateForAllTrans(self.chain[i][0]['transactions'], self.chain[i-1][1]['stateTrieRoot'])
             return True
 
         return False

@@ -4,17 +4,18 @@ import hashlib
 import json
 
 class StateTrie:
-	def __init__(self):
-		self.root = None
+	
 
-
-	def _populateWithPreviousNext (self, previousTrie = None, root = None):
+	@staticmethod
+	def _populateWithPreviousNext (previousTrie = None, root = None):
 		if previousTrie != None:
 			for i in range(16):
 				root.next[i] = previousTrie.next[i]
 		return
 
-	def updateHash (self, root = None):
+
+	@staticmethod
+	def updateHash (root = None):
 		if not root:
 			return 
 
@@ -26,11 +27,12 @@ class StateTrie:
 		return
 
 
-	def traverseTrie (self, addr, amount, multiplier = 1, previousTrie = None, root = None):
+	@staticmethod
+	def traverseTrie (addr, amount, multiplier = 1, previousTrie = None, root = None):
 		if len(addr) == 1:
 			indx = Util.getIndex(addr[0])
 			
-			self._populateWithPreviousNext(previousTrie, root)
+			StateTrie._populateWithPreviousNext(previousTrie, root)
 			
 			curBal = 0
 			
@@ -43,44 +45,47 @@ class StateTrie:
 			#print(root.next[indx].data)
 			root.next[indx].hash = Util.get_hash(json.dumps(amount))
 			
-			self.updateHash (root)
+			StateTrie.updateHash (root)
 
 			return
 
-		self._populateWithPreviousNext(previousTrie, root)
+		StateTrie._populateWithPreviousNext(previousTrie, root)
 
 		indx = Util.getIndex(addr[0])
 		#print ("New Node Created")
 		root.next[indx] = innerNode()
 
 		if not previousTrie:
-			self.traverseTrie(addr[1:], amount, multiplier, previousTrie, root.next[indx])
+			StateTrie.traverseTrie(addr[1:], amount, multiplier, previousTrie, root.next[indx])
 		else:
-			self.traverseTrie(addr[1:], amount, multiplier, previousTrie.next[indx], root.next[indx])
+			StateTrie.traverseTrie(addr[1:], amount, multiplier, previousTrie.next[indx], root.next[indx])
 
-		self.updateHash (root)
+		StateTrie.updateHash (root)
 
 		return
 
 
-	def updateForT (self, t, previousTrie = None):
+	@staticmethod
+	def updateForT (t, previousTrie = None):
 		toAddr = t['to']
 		fromAddr = t['from']
 		root = innerNode()
-		self.traverseTrie(toAddr, t['amount'], 1, previousTrie, root)
+		StateTrie.traverseTrie(toAddr, t['amount'], 1, previousTrie, root)
 		previousTrie = root
 		root = innerNode()
-		self.traverseTrie(fromAddr, t['amount'], -1, previousTrie, root)
+		StateTrie.traverseTrie(fromAddr, t['amount'], -1, previousTrie, root)
 		return root
 
-
-	def updateForAllTrans(self, trans, previousTrie = None):
+	
+	@staticmethod
+	def updateForAllTrans(trans, previousTrie = None):
 		#print(trans)
+		root = None
 		for t in trans:
-			self.root = self.updateForT(t, previousTrie)
-			previousTrie = self.root
+			root = updateForT(t, previousTrie)
+			previousTrie = root
 
-		return self.root
+		return root
 
 	@staticmethod
 	def getData (addr, root):

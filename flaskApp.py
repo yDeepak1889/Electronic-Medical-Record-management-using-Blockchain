@@ -1,10 +1,13 @@
+import os, datetime, time
+from werkzeug.utils import secure_filename
 from blockchain import Blockchain
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from uuid import uuid4
 from merkleTrie.stateTrie import StateTrie
 
 app = Flask(__name__)
 nodeIdentifier = str(uuid4()).replace('-', '')
+UPLOAD_FOLDER = './uploads'
 
 blockchain = Blockchain()
 
@@ -118,6 +121,61 @@ def getBalance():
     response['balance'] = StateTrie.getData(addr, latestStateTrie)
     return jsonify(response), 200
 
+@app.route('/files/upload', methods=['POST', 'GET'])
+def uploadFile():
+    allowedExtensions = set(['txt', 'csv', 'jpg', 'jpeg', 'pdf'])
+
+    if request.method == 'POST':
+        response = {}
+
+        if 'file' not in request.files:
+            response['type'] = 'error'
+            response['desc'] = 'No file part'
+            return jsonify(response)
+        file = request.files['file']
+        if file.filename is '':
+            response['type'] = 'error'
+            response['desc'] = 'No file selected'
+            return jsonify(response)
+        fileExtenstion = file.filename.rsplit('.', 1)[1].lower()
+        if not fileExtenstion in allowedExtensions:
+            response['type'] = 'error'
+            response['desc'] = 'File format not allowed, file extenstions allowed are - ' +\
+                 string.join(allowedExtensions, ', ')
+            return jsonify(response)
+
+        # handled Error
+        filename = secure_filename(file.filename)
+        timeNow = str(time.mktime(datetime.datetime.now().timetuple()))
+        savePath = timeNow + '.' + fileExtenstion
+        file.save(os.path.join(os.path.abspath(UPLOAD_FOLDER), savePath))
+        response['type'] = 'success'
+        response['fileName'] = savePath
+        return jsonify(response), 200
+
+    # get is only for testing
+    elif request.method == 'GET':
+        return '''
+        <!doctype html>
+        <title>Upload new File</title>
+        <h1>Upload new File</h1>
+        <form method=post enctype=multipart/form-data>
+          <p><input type=file name=file>
+             <input type=submit value=Upload>
+        </form>
+        '''
+
+@app.route('/files/access/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
+
+@app.route('/', methods=['GET'])
+def home():
+    return '''
+    <title>Healthy Blockchain</title>
+    <h1>Working</h1>
+    '''
+    pass
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5001)

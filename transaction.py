@@ -1,26 +1,27 @@
-class grantRevokeTransaction(object):
-    def __init__(self, typ = None, patAddr = None, serAddr = None, serReqAddr = None, sig = None,):
-        self.typeT = typ
-        self.patientAddress = patAddr
-        self.serviceProAddress = serAddr
-        self.serviceReqAddress = serReqAddr
-        self.signature = sig
+class sendRequestForAccess(object):
+    def __init__(self, from_ = None, to_ = None, hospitalID = None, diseaseID = None):
+        self.from_ = from_
+        self.to_ = to_
+        self.hospitalID = hospitalID
+        self.diseaseID = diseaseID
 
 
-class recordTransaction(object):
-    def __init__(self, patAddr = None, serAddr = None, hash = None, oldHash = None, sig = None,):
-        self.patientAddress = patAddr
-        self.serviceProAddress = serAddr
+class sendRecord(object):
+    def __init__(self, patAddr = None, hospitalID = None, hash = None, docLink = None, diseaseID = None,):
+        self.from_ = hospitalID
+        self.to_ = patAddr
+        self.diseaseID = diseaseID
         self.hash = hash
-        self.oldHash = oldHash
-        self.signature = sig
+        self.docLink = docLink
+        self.premmissions = [hospitalID]
 
 
-class keyInclusionTransaction(object):
-    def __init__(self, patAddr = None, publicKey = None, sig = None,):
-        self.patientAddress = patAddr
-        self.publicKey = publicKey
-        self.signature = sig
+class grantAccessToRecord(object):
+    def __init__(self, from_ = None, to_ = None, hospitalID = None, diseaseID = None):
+        self.from_ = from_
+        self.to_ = to_
+        self.hospitalID = hospitalID
+        self.diseaseID = diseaseID
 
 
 if __name__ == '__main__':

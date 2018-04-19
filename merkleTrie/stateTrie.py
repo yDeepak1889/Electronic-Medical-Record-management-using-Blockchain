@@ -40,27 +40,37 @@ class StateTrie:
 
 			root.next[indx] = leafNode()
 			root.next[indx].data = curData
-						
-			dataToUpdate = { 
+
+			#Hospital sends record of a patient
+			type_ = tran['type']
+
+			if type_ == 0:
+				dataToUpdate = { 
 				tran['info']['diseaseId']: {
 						tran['info']['docLink']: tran['info']['permmissions']
 					}
-			}
-
-			if tran['type'] == 0:
+				}
 				if root.next[indx].data:
-					if tran['to'] in root.next[indx].data:
-						if tran['info']['diseaseId'] in root.next[indx].data[tran['to']]:
-							root.next[indx].data[tran['to']][tran['info']['diseaseId']][tran['info']['docLink']] = tran['info']['permmissions']
+					if tran['from'] in root.next[indx].data:
+						if tran['info']['diseaseId'] in root.next[indx].data[tran['from']]:
+							root.next[indx].data[tran['from']][tran['info']['diseaseId']][tran['info']['docLink']] = tran['info']['permmissions']
 						else:
-							root.next[indx].data[tran['to']] = dataToUpdate
+							root.next[indx].data[tran['from']] = dataToUpdate
 					else:
-						root.next[indx].data[tran['to']] = dataToUpdate
+						root.next[indx].data[tran['from']] = dataToUpdate
 
 				else:
 					root.next[indx].data = {
-						tran['to']: dataToUpdate
+						tran['from']: dataToUpdate
 					}
+			#Patient grants permmission to new hospital to access data of specified hospitalId and diseadeId
+			elif type_ == 1:
+				root.next[indx].data[tran['hospitalId']][tran['diseaseId']].append(tran['to'])
+			
+			elif type_ == 2:
+				root.next[indx].data[tran['hospitalId']][tran['diseaseId']].remove(tran['to'])
+
+
 
 			root.next[indx].hash = Util.get_hash(json.dumps(tran))
 			
@@ -86,7 +96,7 @@ class StateTrie:
 
 	@staticmethod
 	def updateForT (t, previousTrie = None):
-		if t['type'] == 2:
+		if t['type'] != 0:
 			toAddr = t['from']
 			fromAddr = t['to']
 		else:
@@ -122,7 +132,7 @@ class StateTrie:
 		return StateTrie.getData(addr[1:], root.next[indx])
 
 
-'''
+
 #For Testing Purpose
 
 trieRoot = StateTrie()
@@ -132,7 +142,7 @@ docLink = "http://www.dummy.com"
 from_ = Util.get_hash('abcdefgh1234')[:20]
 
 tran1 = {
-	'from': Util.get_hash('abcdefgh1234')[:20],
+	'from': Util.get_hash('abcdefgh123477')[:20],
 	'to': Util.get_hash('abcdefgh12345')[:20],
 	'type' : 0,
 	'info':{
@@ -265,4 +275,3 @@ print (trieRoot1.getData(tran11['to'], root1))
 # print (trieRoot1.getData(tran21['to'], root1))
 # print (trieRoot1.getData(tran31['to'], root1))
 # print (trieRoot1.getData(tran41['to'], root1))
-'''

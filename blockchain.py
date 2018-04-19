@@ -157,3 +157,25 @@ class Blockchain(object):
             'permmissions' : [from_]
         }
         return newTransaction(from_, to_, type_, info)
+
+    def grantAccessTransaction(self, from_, to_, hospitalId, diseaseId):
+        lastBlk = self.lastBlock
+        stateTrie = lastBlk[1]['stateTrieRoot']
+
+        dataBlock = StateTrie.getData(from_, stateTrie)
+        if not dataBlock:
+            return False
+
+        if hospitalId in dataBlock:
+            if not diseaseId in dataBlock['hospitalId']:
+                return False
+        else:
+            return False
+
+        type_ = 1
+        info = {
+            'hospitalId' : hospitalId,
+            'diseaseId': diseaseId
+        }
+
+        return newTransaction(from_, to_, type_, info)

@@ -188,5 +188,15 @@ def submitRecord():
     blockchain.submitRecordTransaction(values['from'], values['to'], values['diseaseID'], values['docLink'])
 
 
+@app.route('/grantAccess', methods=['POST'])
+def grantAccess():
+    values = request.get_json()
+    required = ['from', 'to', 'hospitalId', 'diseaseId']
+
+    if not all(k in values for k in required):
+        return "Missing values", 400
+
+    blockchain.grantAccessTransaction(values['from'], values['to'], values['hospitalId'], values['diseaseId'])
+
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5001)

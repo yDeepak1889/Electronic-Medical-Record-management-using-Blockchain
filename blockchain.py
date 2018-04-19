@@ -8,6 +8,8 @@ import hashlib
 from merkleTrie.stateTrie import *
 from merkleTrie.merkleTrie import *
 from merkleTrie.utils import *
+from utils import get_hash
+
 
 class Blockchain(object):
     def __init__(self):
@@ -74,11 +76,12 @@ class Blockchain(object):
         self.chain.append(block)
         return block
 
-    def newTransaction(self, sender, recipient, amount):
+    def newTransaction(self, sender, recipient, type_, info):
         self.currentTransaction.append({
             'from': sender,
             'to': recipient,
-            'amount': amount
+            'type': type_,
+            'info': info
         })
         return self.lastBlock[0]['index'] + 1
 
@@ -144,3 +147,13 @@ class Blockchain(object):
             return True
 
         return False
+
+    def submitRecordTransaction(self, from_, to_, diseaseId, docLink):
+        hashOfDoc = get_hash(docLink) #update this to get hash of original doc
+        type_ = 0
+        info = {
+            'diseaseId' : diseaseId,
+            'docLink': docLink,
+            'permmissions' : [from_]
+        }
+        return newTransaction(from_, to_, type_, info)

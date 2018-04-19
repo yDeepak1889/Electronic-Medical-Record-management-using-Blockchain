@@ -1,11 +1,10 @@
-from merkleTrie.nodes import *
-from merkleTrie.utils import *
+from nodes import *
+from utils import *
 import hashlib
 import json
 
 class StateTrie:
 	
-
 	@staticmethod
 	def _populateWithPreviousNext (previousTrie = None, root = None):
 		if previousTrie != None:
@@ -28,22 +27,42 @@ class StateTrie:
 
 
 	@staticmethod
-	def traverseTrie (addr, amount, multiplier = 1, previousTrie = None, root = None):
+	def traverseTrie (addr, tran, previousTrie = None, root = None):
 		if len(addr) == 1:
 			indx = Util.getIndex(addr[0])
 			
 			StateTrie._populateWithPreviousNext(previousTrie, root)
 			
-			curBal = 0
+			curData = None
 			
 			if root.next[indx]:
-				curBal = root.next[indx].data
-				#print (curBal, '----')
+				curData = root.next[indx].data
 
 			root.next[indx] = leafNode()
-			root.next[indx].data = curBal + multiplier*amount
-			#print(root.next[indx].data)
-			root.next[indx].hash = Util.get_hash(json.dumps(amount))
+			root.next[indx].data = curData
+						
+			dataToUpdate = { 
+				tran['info']['diseaseId']: {
+						tran['info']['docLink']: tran['info']['permmissions']
+					}
+			}
+
+			if tran['type'] == 0:
+				if root.next[indx].data:
+					if tran['to'] in root.next[indx].data:
+						if tran['info']['diseaseId'] in root.next[indx].data[tran['to']]:
+							root.next[indx].data[tran['to']][tran['info']['diseaseId']][tran['info']['docLink']] = tran['info']['permmissions']
+						else:
+							root.next[indx].data[tran['to']] = dataToUpdate
+					else:
+						root.next[indx].data[tran['to']] = dataToUpdate
+
+				else:
+					root.next[indx].data = {
+						tran['to']: dataToUpdate
+					}
+
+			root.next[indx].hash = Util.get_hash(json.dumps(tran))
 			
 			StateTrie.updateHash (root)
 
@@ -52,13 +71,13 @@ class StateTrie:
 		StateTrie._populateWithPreviousNext(previousTrie, root)
 
 		indx = Util.getIndex(addr[0])
-		#print ("New Node Created")
+		
 		root.next[indx] = innerNode()
 
 		if not previousTrie:
-			StateTrie.traverseTrie(addr[1:], amount, multiplier, previousTrie, root.next[indx])
+			StateTrie.traverseTrie(addr[1:], tran, previousTrie, root.next[indx])
 		else:
-			StateTrie.traverseTrie(addr[1:], amount, multiplier, previousTrie.next[indx], root.next[indx])
+			StateTrie.traverseTrie(addr[1:], tran, previousTrie.next[indx], root.next[indx])
 
 		StateTrie.updateHash (root)
 
@@ -67,21 +86,25 @@ class StateTrie:
 
 	@staticmethod
 	def updateForT (t, previousTrie = None):
-		toAddr = t['to']
-		fromAddr = t['from']
+		if t['type'] == 2:
+			toAddr = t['from']
+			fromAddr = t['to']
+		else:
+			toAddr = t['to']
+			fromAddr = t['from']
+
 		root = innerNode()
-		StateTrie.traverseTrie(toAddr, t['amount'], 1, previousTrie, root)
-		previousTrie = root
-		root = innerNode()
-		StateTrie.traverseTrie(fromAddr, t['amount'], -1, previousTrie, root)
+		
+		StateTrie.traverseTrie(toAddr, t, previousTrie, root)
 		return root
 
 	
 	@staticmethod
 	def updateForAllTrans(trans, previousTrie = None):
-		#print(trans)
+		
 		root = None
 		for t in trans:
+			
 			root = StateTrie.updateForT(t, previousTrie)
 			previousTrie = root
 
@@ -92,7 +115,7 @@ class StateTrie:
 		if not root:
 			return None
 		if not addr:
-			#print(root.data)
+			
 			return root.data
 
 		indx = Util.getIndex(addr[0])
@@ -100,88 +123,146 @@ class StateTrie:
 
 
 '''
+#For Testing Purpose
+
 trieRoot = StateTrie()
 
+diseaseId = "abcdefgh1234"
+docLink = "http://www.dummy.com"
+from_ = Util.get_hash('abcdefgh1234')[:20]
+
 tran1 = {
-	'to': Util.get_hash('abcdefgh1234')[:20],
 	'from': Util.get_hash('abcdefgh1234')[:20],
-	'amount': 1
-	}
-
-
-tran2 = {
 	'to': Util.get_hash('abcdefgh12345')[:20],
-	'from': Util.get_hash('abcdefgh1234')[:20],
-	'amount': 1
-	}
-tran3 = {
-	'to': Util.get_hash('abcdefgh12346')[:20],
-	'from': Util.get_hash('abcdefgh1234')[:20],
-	'amount': 1
-	}
-tran4 = {
-	'to': Util.get_hash('abcdefgh12347')[:20],
-	'from': Util.get_hash('abcdefgh1234')[:20],
-	'amount': 1
-	}
-tran5 = {
-	'to': Util.get_hash('abcdefgh12348')[:20],
-	'from': Util.get_hash('abcdefgh1234')[:20],
-	'amount': 1
+	'type' : 0,
+	'info':{
+		'diseaseId' : diseaseId,
+		'docLink': docLink,
+		'permmissions' : [from_]
+		}
 	}
 
-trans = [tran1, tran2, tran3, tran4, tran5]
+
+# tran2 = {
+# 	'from': Util.get_hash('abcdefgh12345')[:20],
+# 	'to': Util.get_hash('abcdefgh1234')[:20],
+# 	'type' : 0,
+# 	'info':{
+# 		'diseaseId' : diseaseId,
+# 		'docLink': docLink,
+# 		'permmissions' : [from_]
+# 		}
+# 	}
+# tran3 = {
+# 	'from': Util.get_hash('abcdefgh12346')[:20],
+# 	'to': Util.get_hash('abcdefgh1234')[:20],
+# 	'type' : 0,
+# 	'info':{
+# 		'diseaseId' : diseaseId,
+# 		'docLink': docLink,
+# 		'permmissions' : [from_]
+# 		}
+# 	}
+# tran4 = {
+# 	'from': Util.get_hash('abcdefgh12347')[:20],
+# 	'to': Util.get_hash('abcdefgh1234')[:20],
+# 	'type' : 0,
+# 	'info':{
+# 		'diseaseId' : diseaseId,
+# 		'docLink': docLink,
+# 		'permmissions' : [from_]
+# 		}
+# 	}
+# tran5 = {
+# 	'from': Util.get_hash('abcdefgh12348')[:20],
+# 	'to': Util.get_hash('abcdefgh1234')[:20],
+# 	'type' : 0,
+# 	'info':{
+# 		'diseaseId' : diseaseId,
+# 		'docLink': docLink,
+# 		'permmissions' : [from_]
+# 		}
+# 	}
+
+trans = [tran1]
 root = trieRoot.updateForAllTrans (trans)
 
-print(root.hash)
-print (trieRoot.getData(tran1['to'], root))
+#print(root.hash)
+#print (trieRoot.getData(tran1['to'], root))
 
 
 
 trieRoot1 = StateTrie()
 
+diseaseId = "abcdefgh1234"
+docLink = "http://www.dummy.comm"
+from_ = Util.get_hash('abcdefgh123')[:20]
+
 tran11 = {
-	'to': Util.get_hash('abcdefgh12341')[:20],
 	'from': Util.get_hash('abcdefgh1234')[:20],
-	'amount': 1
-
-}
-tran21 = {
 	'to': Util.get_hash('abcdefgh12345')[:20],
-	'from': Util.get_hash('abcdefgh1234')[:20],
-	'amount': 1
+	'type' : 0,
+	'info':{
+		'diseaseId' : diseaseId,
+		'docLink': docLink,
+		'permmissions' : [from_]
+		}
+	}
 
-}
+
+tran21 = {
+	'from': Util.get_hash('abcdefgh12345')[:20],
+	'to': Util.get_hash('abcdefgh1234')[:20],
+	'type' : 0,
+	'info':{
+		'diseaseId' : diseaseId,
+		'docLink': docLink,
+		'permmissions' : [from_]
+		}
+	}
 tran31 = {
-	'to': Util.get_hash('abcdefgh12346')[:20],
-	'from': Util.get_hash('abcdefgh1234')[:20],
-	'amount': 1
-
-}
+	'from': Util.get_hash('abcdefgh12346')[:20],
+	'to': Util.get_hash('abcdefgh1234')[:20],
+	'type' : 0,
+	'info':{
+		'diseaseId' : diseaseId,
+		'docLink': docLink,
+		'permmissions' : [from_]
+		}
+	}
 tran41 = {
-	'to': Util.get_hash('abcdefgh1234711')[:20],
-	'from': Util.get_hash('abcdefgh1234')[:20],
-	'amount': 1
-
-}
+	'from': Util.get_hash('abcdefgh12347')[:20],
+	'to': Util.get_hash('abcdefgh1234')[:20],
+	'type' : 0,
+	'info':{
+		'diseaseId' : diseaseId,
+		'docLink': docLink,
+		'permmissions' : [from_]
+		}
+	}
 tran51 = {
-	'to': Util.get_hash('abcdefgh12348')[:20],
-	'from': Util.get_hash('abcdefgh1234')[:20],
-	'amount': "This is a test amount51"
-}
+	'from': Util.get_hash('abcdefgh12348')[:20],
+	'to': Util.get_hash('abcdefgh1234')[:20],
+	'type' : 0,
+	'info':{
+		'diseaseId' : diseaseId,
+		'docLink': docLink,
+		'permmissions' : [from_]
+		}
+	}
 
 trans = [tran11]
-root1 = trieRoot1.updateForAllTrans (trans, trieRoot.root)
+root1 = trieRoot1.updateForAllTrans (trans, root)
 
-print(root1.hash)
+#print(root1.hash)
 
-print (trieRoot1.getData(tran1['to'], root1))
-print (trieRoot1.getData(tran2['to'], root1))
-print (trieRoot1.getData(tran3['to'], root1))
-print (trieRoot1.getData(tran4['to'], root1))
-print (trieRoot1.getData(tran5['to'], root1))
+# print (trieRoot1.getData(tran1['to'], root1))
+# print (trieRoot1.getData(tran2['to'], root1))
+# print (trieRoot1.getData(tran3['to'], root1))
+# print (trieRoot1.getData(tran4['to'], root1))
+# print (trieRoot1.getData(tran5['to'], root1))
 print (trieRoot1.getData(tran11['to'], root1))
-print (trieRoot1.getData(tran21['to'], root1))
-print (trieRoot1.getData(tran31['to'], root1))
-print (trieRoot1.getData(tran41['to'], root1))
+# print (trieRoot1.getData(tran21['to'], root1))
+# print (trieRoot1.getData(tran31['to'], root1))
+# print (trieRoot1.getData(tran41['to'], root1))
 '''

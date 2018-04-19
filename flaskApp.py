@@ -119,5 +119,16 @@ def getBalance():
     return jsonify(response), 200
 
 
+@app.route('/submitRecord', methods=['POST'])
+def submitRecord():
+    values = request.get_json()
+    required = ['from', 'to', 'diseaseID', 'docLink']
+
+    if not all(k in values for k in required):
+        return "Missing values", 400
+
+    blockchain.submitRecordTransaction(values['from'], values['to'], values['diseaseID'], values['docLink'])
+
+
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5001)

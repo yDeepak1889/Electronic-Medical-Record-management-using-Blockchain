@@ -4,9 +4,12 @@ class sendRequestForAccess(object):
         self.to_ = to_
         self.hospitalID = hospitalID
         self.diseaseID = diseaseID
+    
+    def getType():
+        return 0;
 
 
-class sendRecord(object):
+class submitRecord(object):
     def __init__(self, patAddr = None, hospitalID = None, hash = None, docLink = None, diseaseID = None,):
         self.from_ = hospitalID
         self.to_ = patAddr
@@ -14,6 +17,9 @@ class sendRecord(object):
         self.hash = hash
         self.docLink = docLink
         self.premmissions = [hospitalID]
+
+    def getType():
+        return 1;
 
 
 class grantAccessToRecord(object):
@@ -23,6 +29,6 @@ class grantAccessToRecord(object):
         self.hospitalID = hospitalID
         self.diseaseID = diseaseID
 
+    def getType():
+        return 2;
 
-if __name__ == '__main__':
-    ojb = grantRevokeTransaction()

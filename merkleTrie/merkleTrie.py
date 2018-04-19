@@ -1,7 +1,7 @@
 from merkleTrie.nodes import *
 from merkleTrie.utils import Util
 import json
-
+import Blockchain.get_hash
 
 
 class MerkleTrie:
@@ -50,8 +50,8 @@ class MerkleTrie:
 		if root == None:
 			return
 
-		tranID = t['to']
-		self.traverseTrie(tranID, t['amount'], root)
+		tranID = Util.get_hash(json.dumps(t))[0:20]
+		self.traverseTrie(tranID, t, root)
 
 
 	def updateForAllTrans(self, trans):

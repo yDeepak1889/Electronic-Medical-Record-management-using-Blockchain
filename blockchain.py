@@ -158,7 +158,7 @@ class Blockchain(object):
         }
         return newTransaction(from_, to_, type_, info)
 
-    def grantAccessTransaction(self, from_, to_, hospitalId, diseaseId):
+    def grantRevokeAccessTransaction(self, from_, to_, hospitalId, diseaseId, type_=1):
         lastBlk = self.lastBlock
         stateTrie = lastBlk[1]['stateTrieRoot']
 
@@ -172,7 +172,6 @@ class Blockchain(object):
         else:
             return False
 
-        type_ = 1
         info = {
             'hospitalId' : hospitalId,
             'diseaseId': diseaseId

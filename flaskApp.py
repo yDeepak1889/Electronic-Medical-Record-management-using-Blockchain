@@ -196,7 +196,19 @@ def grantAccess():
     if not all(k in values for k in required):
         return "Missing values", 400
 
-    blockchain.grantAccessTransaction(values['from'], values['to'], values['hospitalId'], values['diseaseId'])
+    blockchain.grantRevokeAccessTransaction(values['from'], values['to'], values['hospitalId'], values['diseaseId'])
+
+
+@app.route('/revokeAccess',  methods=['POST'])
+def revokeAccess():
+    values = request.get_json()
+    required = ['from', 'to', 'hospitalId', 'diseaseId']
+
+    if not all(k in values for k in required):
+        return "Missing values", 400
+
+    blockchain.grantRevokeAccessTransaction(values['from'], values['to'], values['hospitalId'], values['diseaseId'], 2)
+
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5001)

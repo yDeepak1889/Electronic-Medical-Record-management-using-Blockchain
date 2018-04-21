@@ -8,7 +8,6 @@ import hashlib
 from merkleTrie.stateTrie import *
 from merkleTrie.merkleTrie import *
 from merkleTrie.utils import *
-from utils import get_hash
 
 
 class Blockchain(object):
@@ -35,10 +34,11 @@ class Blockchain(object):
             #rint (len(self.chain))
             #print ('Booom')
             return None
-        
-        merkleTrie = MerkleTrie() 
+
+        merkleTrie = MerkleTrie()
         merkleRoot = merkleTrie.updateForAllTrans (self.currentTransaction)
-        
+
+
         if len(self.chain) == 0:
             preH = previousHash
             stateTrieRoot = StateTrie.updateForAllTrans (self.currentTransaction)
@@ -63,14 +63,14 @@ class Blockchain(object):
             'proof': proof,
             'previousHash': preH,
             'stateTrieHash': stateHash,
-            'merkleRootHash': merkleHash 
+            'merkleRootHash': merkleHash
             },
-            
             {
             'stateTrieRoot': stateTrieRoot,
             'merkleTrieRoot': merkleRoot
             }
         ]
+        block[0]['hash'] = Blockchain.hash(block[0])
 
         self.currentTransaction = []
         self.chain.append(block)
@@ -83,6 +83,7 @@ class Blockchain(object):
             'type': type_,
             'info': info
         })
+        print (info)
         return self.lastBlock[0]['index'] + 1
 
     @staticmethod
@@ -140,6 +141,7 @@ class Blockchain(object):
                 newChain = chain
 
         if newChain:
+            print ("New Chain found")
             self.chain = newChain
             length = len(chain)
             for i in range(1, length):
@@ -149,20 +151,21 @@ class Blockchain(object):
         return False
 
     def submitRecordTransaction(self, from_, to_, diseaseId, docLink):
-        hashOfDoc = get_hash(docLink) #update this to get hash of original doc
+        hashOfDoc = Util.get_hash(docLink) #update this to get hash of original doc
         type_ = 0
         info = {
             'diseaseId' : diseaseId,
             'docLink': docLink,
             'permmissions' : [from_]
         }
-        return newTransaction(from_, to_, type_, info)
+        return self.newTransaction(Util.get_hash(from_)[30:], Util.get_hash(to_)[30:], type_, info)
 
     def grantRevokeAccessTransaction(self, from_, to_, hospitalId, diseaseId, type_=1):
         lastBlk = self.lastBlock
         stateTrie = lastBlk[1]['stateTrieRoot']
 
         dataBlock = StateTrie.getData(from_, stateTrie)
+        print (dataBlock)
         if not dataBlock:
             return False
 
@@ -177,4 +180,5 @@ class Blockchain(object):
             'diseaseId': diseaseId
         }
 
-        return newTransaction(from_, to_, type_, info)
+        print (info)
+        return self.newTransaction(from_, to_, type_, info)

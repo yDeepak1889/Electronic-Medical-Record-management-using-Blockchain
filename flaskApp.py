@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 from blockchain import Blockchain
 from flask import Flask, jsonify, request, send_from_directory
 from uuid import uuid4
+from merkleTrie.utils import *
 from merkleTrie.stateTrie import StateTrie
 
 app = Flask(__name__)
@@ -14,6 +15,7 @@ blockchain = Blockchain()
 
 @app.route('/mine', methods=['GET'])
 def mine():
+    replaced = blockchain.resolveConflicts()
     last_block = blockchain.lastBlock
     lastProof = last_block[0]['proof']
     proof = blockchain.proofOfWork(lastProof)
@@ -36,29 +38,44 @@ def mine():
     return jsonify(response), 200
 
 
-@app.route('/catchNewBlock', POST=['GET'])
+@app.route('/catchNewBlock', methods=['POST'])
 def catchNewBlock():
-    
-
-@app.route('/transactions/new', methods=['POST'])
-def newTransaction():
     values = request.get_json()
-
-    required = ['sender', 'recipient', 'amount']
-
+    required = ['hash', 'index', 'timestamp', 'transactions', 'proof', 'previousHash', 'stateTrieHash', 'merkleRootHash']
     if not all(k in values for k in required):
         return "Missing values", 400
 
-    index = blockchain.newTransaction(values['sender'], values['recipient'], values['amount'])
+    lastBlk = blockchain.lastBlock
 
-    response = {'message': str('Transaction will be added to Block ' + str(index))}
+    if lastBlk['index'] + 1 != values['index']:
+        replaced = blockchain.resolveConflicts()
+        return "", 400
 
-    return jsonify(response), 201
+    if values['previousHash'] == lastBlk['hash']:
+        blockchain.chain.append(values)
+        return "New Block Added", 200
+
+    return "", 200
+
+# @app.route('/transactions/new', methods=['POST'])
+# def newTransaction():
+#     values = request.get_json()
+#
+#     required = ['from', 'to', 'type', 'info']
+#
+#     if not all(k in values for k in required):
+#         return "Missing values", 400
+#
+#     index = blockchain.newTransaction(values['from'], values['to'], values['type'], values['info'])
+#
+#     response = {'message': str('Transaction will be added to Block ' + str(index))}
+#
+#     return jsonify(response), 201
 
 
 @app.route('/chain', methods=['GET'])
 def fullChain():
-
+    #print ('Success')
     fullChainArr = []
     for block in blockchain.chain:
         fullChainArr.append(block[0])
@@ -168,24 +185,25 @@ def home():
 
 @app.route('/submitRecord', methods=['POST'])
 def submitRecord():
-    values = request.get_json()
-    required = ['from', 'to', 'diseaseID', 'docLink']
+    values = request.get_json(force=True)
+    required = ['from', 'to', 'diseaseID', 'docLink', 'hash']
 
     if not all(k in values for k in required):
         return "Missing values", 400
 
     blockchain.submitRecordTransaction(values['from'], values['to'], values['diseaseID'], values['docLink'])
 
+    return "Record Submitted", 200
 
 @app.route('/grantAccess', methods=['POST'])
 def grantAccess():
-    values = request.get_json()
+    values = request.get_json(force=True)
     required = ['from', 'to', 'hospitalId', 'diseaseId']
 
     if not all(k in values for k in required):
         return "Missing values", 400
 
-    blockchain.grantRevokeAccessTransaction(values['from'], values['to'], values['hospitalId'], values['diseaseId'])
+    blockchain.grantRevokeAccessTransaction(Util.get_hash(values['from'])[30:], Util.get_hash(values['to'])[30:], Util.get_hash(values['hospitalId'])[30:], values['diseaseId'])
 
 
 @app.route('/revokeAccess',  methods=['POST'])

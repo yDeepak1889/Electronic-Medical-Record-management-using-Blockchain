@@ -1,7 +1,6 @@
 from merkleTrie.nodes import *
 from merkleTrie.utils import Util
 import json
-import Blockchain.get_hash
 
 
 class MerkleTrie:
@@ -11,7 +10,7 @@ class MerkleTrie:
 
 	def updateHash (self, root = None):
 		if not root:
-			return 
+			return
 
 		nodeHash = ""
 		for i in range(16):
@@ -43,14 +42,14 @@ class MerkleTrie:
 
 		self.traverseTrie(tranID[1:], tranData, root.next[indx])
 		self.updateHash(root)
-		return		
+		return
 
 
 	def updateForT (self, t, root = None):
 		if root == None:
 			return
 
-		tranID = Util.get_hash(json.dumps(t))[0:20]
+		tranID = Util.get_hash(json.dumps(t))[20:]
 		self.traverseTrie(tranID, t, root)
 
 

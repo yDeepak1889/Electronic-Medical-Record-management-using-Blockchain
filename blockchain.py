@@ -35,21 +35,31 @@ class Blockchain(object):
             #print ('Booom')
             return None
 
+        #Check for validity of transactions
+
+
         merkleTrie = MerkleTrie()
         merkleRoot = merkleTrie.updateForAllTrans (self.currentTransaction)
 
 
         if len(self.chain) == 0:
             preH = previousHash
-            stateTrieRoot = StateTrie.updateForAllTrans (self.currentTransaction)
+            patientStateTrieRoot = StateTrie.updateForAllTrans (self.currentTransaction)
+            hospitalStateTrieRoot = StateTrie.updateForAllTrans (self.currentTransaction, None, True)
         else:
             preH = self.hash(self.chain[-1][0])
-            stateTrieRoot = StateTrie.updateForAllTrans (self.currentTransaction, self.chain[-1][1]['stateTrieRoot'])
+            patientStateTrieRoot = StateTrie.updateForAllTrans (self.currentTransaction, self.chain[-1][1]['patientStateTrieRoot'])
+            hospitalStateTrieRoot = StateTrie.updateForAllTrans (self.currentTransaction, self.chain[-1][1]['hospitalStateTrieRoot'], True)
 
-        if not stateTrieRoot:
-            stateHash = None
+        if not patientStateTrieRoot:
+            patientStateTrieHash = None
         else:
-            stateHash = stateTrieRoot.hash
+            patientStateTrieHash = patientStateTrieRoot.hash
+
+        if not hospitalStateTrieRoot:
+            hospitalStateTrieHash = None
+        else:
+            hospitalStateTrieHash = hospitalStateTrieRoot.hash
 
         if not merkleRoot:
             merkleHash = None
@@ -62,12 +72,14 @@ class Blockchain(object):
             'transactions': self.currentTransaction,
             'proof': proof,
             'previousHash': preH,
-            'stateTrieHash': stateHash,
-            'merkleRootHash': merkleHash
+            'patientStateTrieHash': patientStateTrieHash,
+            'merkleRootHash': merkleHash,
+            'hospitalStateTrieHash': hospitalStateTrieHash
             },
             {
-            'stateTrieRoot': stateTrieRoot,
-            'merkleTrieRoot': merkleRoot
+            'patientStateTrieRoot': patientStateTrieRoot,
+            'merkleTrieRoot': merkleRoot,
+            'hospitalStateTrieRoot': hospitalStateTrieRoot
             }
         ]
         block[0]['hash'] = Blockchain.hash(block[0])
@@ -145,7 +157,7 @@ class Blockchain(object):
             self.chain = newChain
             length = len(chain)
             for i in range(1, length):
-                StateTrie.updateForAllTrans(self.chain[i][0]['transactions'], self.chain[i-1][1]['stateTrieRoot'])
+                StateTrie.updateForAllTrans(self.chain[i][0]['transactions'], self.chain[i-1][1]['patientStateTrieRoot'])
             return True
 
         return False
@@ -163,7 +175,7 @@ class Blockchain(object):
 
     def grantRevokeAccessTransaction(self, from_, to_, hospitalId, diseaseId, type_=1):
         lastBlk = self.lastBlock
-        stateTrie = lastBlk[1]['stateTrieRoot']
+        stateTrie = lastBlk[1]['patientStateTrieRoot']
 
         dataBlock = StateTrie.getData(from_, stateTrie)
         #print (dataBlock)
@@ -185,14 +197,17 @@ class Blockchain(object):
         return self.newTransaction(from_, to_, type_, info)
 
 
-    def getPatientData(self, addr):
+    def getData(self, addr, isP=False):
         lastBlk = self.lastBlock
-        stateTrie = lastBlk[1]['stateTrieRoot']
+
+        if isP:
+            stateTrie = lastBlk[1]['patientStateTrieRoot']
+        else:
+            stateTrie = lastBlk[1]['hospitalStateTrieRoot']
 
         dataBlock = StateTrie.getData(addr, stateTrie)
-        
+
         if not dataBlock:
             return {'No Record Exists'}
 
         return dataBlock
-

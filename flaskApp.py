@@ -204,19 +204,18 @@ def revokeAccess():
 
 
 @app.route('/getData', methods=['POST', 'GET'])
-def getData():
+def getPData():
     values = request.get_json(force=True)
 
-    required = ['addr']
+    required = ['addr', 'isP']
 
     if not all(k in values for k in required):
         return "Missing values", 400
 
-    response = blockchain.getPatientData(Util.get_hash(values['addr'])[30:]);
+    response = blockchain.getData(Util.get_hash(values['addr'])[30:], values['isP']);
 
     return jsonify(response), 200
 
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5001)
-

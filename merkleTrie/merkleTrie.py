@@ -49,7 +49,7 @@ class MerkleTrie:
 		if root == None:
 			return
 
-		tranID = Util.get_hash(json.dumps(t))[20:]
+		tranID = Util.get_hash(json.dumps(t))
 		self.traverseTrie(tranID, t, root)
 
 

@@ -50,8 +50,15 @@ r = requests.post(hostName+'submitRecord', data=json.dumps(params))
 print(r.text)
 
 r = requests.get(hostName+'mine')
-print(r.text)
+#print(r.text)
 
+
+params = {
+    "addr": "12345abcdefghsh",
+	"isP": True
+}
+r = requests.post(hostName+'getData', data=json.dumps(params))
+print(r.text)
 
 params = {
     "from": "12345abcdefghsh",
@@ -64,13 +71,14 @@ r = requests.post(hostName+'grantAccess', data=json.dumps(params))
 print(r.text)
 
 r = requests.get(hostName+'mine')
-print (r.text)
+#print (r.text)
 
 r = requests.get(hostName+'chain')
-print (r.text)
+#print (r.text)
 
 params = {
-    "addr": "12345abcdefghsh"
+    "addr": "12345abcdefghsh",
+	"isP": True
 }
 r = requests.post(hostName+'getData', data=json.dumps(params))
 print(r.text)
@@ -86,13 +94,22 @@ r = requests.post(hostName+'revokeAccess', data=json.dumps(params))
 print(r.text)
 
 r = requests.get(hostName+'mine')
-print (r.text)
+#print (r.text)
 
 r = requests.get(hostName+'chain')
-print (r.text)
+#print (r.text)
 
 params = {
-    "addr": "12345abcdefghsh"
+    "addr": "12345abcdefghsh",
+	"isP": True
+}
+r = requests.post(hostName+'getData', data=json.dumps(params))
+print(r.text)
+
+
+params = {
+    "addr": "abcde12345",
+	"isP": False
 }
 r = requests.post(hostName+'getData', data=json.dumps(params))
 print(r.text)

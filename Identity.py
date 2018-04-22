@@ -10,15 +10,10 @@ import pyqrcode
 class Identity(object):
 	
 	def generateKey(self, password):
-
 		randomSalt = "HelloWorld"
 		pubKey = scrypt.hash(password, randomSalt)
-		QR = pyqrcode.create(str(pubKey), error='L', version=8, mode='binary')
-		
+		QR = pyqrcode.create(str(pubKey), error='L', version=8, mode='binary')	
 		return pubKey, QR
-
-
-
 
 
 i = Identity()

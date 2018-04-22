@@ -2,16 +2,17 @@ import os, datetime, time
 from werkzeug.utils import secure_filename
 from blockchain import Blockchain
 from flask import Flask, jsonify, request, send_from_directory
+from flask_cors import CORS
 from uuid import uuid4
 from merkleTrie.utils import *
 from merkleTrie.stateTrie import StateTrie
 
 app = Flask(__name__)
+CORS(app)
 nodeIdentifier = str(uuid4()).replace('-', '')
 UPLOAD_FOLDER = './uploads'
 
 blockchain = Blockchain()
-
 
 @app.route('/mine', methods=['GET'])
 def mine():

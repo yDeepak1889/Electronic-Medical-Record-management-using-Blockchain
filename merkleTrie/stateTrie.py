@@ -1,10 +1,10 @@
-from nodes import *
-from utils import *
+from merkleTrie.nodes import *
+from merkleTrie.utils import *
 import hashlib
 import json
 
 class StateTrie:
-	
+
 	@staticmethod
 	def _populateWithPreviousNext (previousTrie = None, root = None):
 		if previousTrie != None:
@@ -16,7 +16,7 @@ class StateTrie:
 	@staticmethod
 	def updateHash (root = None):
 		if not root:
-			return 
+			return
 
 		nodeHash = ""
 		for i in range(16):
@@ -30,11 +30,11 @@ class StateTrie:
 	def traverseTrie (addr, tran, previousTrie = None, root = None):
 		if len(addr) == 1:
 			indx = Util.getIndex(addr[0])
-			
+
 			StateTrie._populateWithPreviousNext(previousTrie, root)
-			
+
 			curData = None
-			
+
 			if root.next[indx]:
 				curData = root.next[indx].data
 
@@ -45,15 +45,17 @@ class StateTrie:
 			type_ = tran['type']
 
 			if type_ == 0:
-				dataToUpdate = { 
+				dataToUpdate = {
 				tran['info']['diseaseId']: {
-						tran['info']['docLink']: tran['info']['permmissions']
+						"docs": [{"link":tran['info']['docLink'], "hash":tran['info']['hash']}],
+						"permmissions": [tran['info']['permmissions']]
 					}
 				}
 				if root.next[indx].data:
 					if tran['from'] in root.next[indx].data:
 						if tran['info']['diseaseId'] in root.next[indx].data[tran['from']]:
-							root.next[indx].data[tran['from']][tran['info']['diseaseId']][tran['info']['docLink']] = tran['info']['permmissions']
+							root.next[indx].data[tran['from']][tran['info']['diseaseId']][tran['info']['docs']].append({"link":tran['info']['docLink'], "hash":tran['info']['hash']})
+							root.next[indx].data[tran['from']][tran['info']['diseaseId']][tran['info']['permmissions']].append(tran['info']['permmissions'])
 						else:
 							root.next[indx].data[tran['from']] = dataToUpdate
 					else:
@@ -65,15 +67,16 @@ class StateTrie:
 					}
 			#Patient grants permmission to new hospital to access data of specified hospitalId and diseadeId
 			elif type_ == 1:
-				root.next[indx].data[tran['hospitalId']][tran['diseaseId']].append(tran['to'])
-			
+				root.next[indx].data[tran['info']['hospitalId']][tran['info']['diseaseId']]['permmissions'].append(tran['to'])
+
 			elif type_ == 2:
-				root.next[indx].data[tran['hospitalId']][tran['diseaseId']].remove(tran['to'])
+				if tran['to'] in root.next[indx].data[tran['info']['hospitalId']][tran['info']['diseaseId']]['permmissions']:
+					root.next[indx].data[tran['info']['hospitalId']][tran['info']['diseaseId']]['permmissions'].remove(tran['to'])
 
 
 
 			root.next[indx].hash = Util.get_hash(json.dumps(tran))
-			
+
 			StateTrie.updateHash (root)
 
 			return
@@ -81,7 +84,7 @@ class StateTrie:
 		StateTrie._populateWithPreviousNext(previousTrie, root)
 
 		indx = Util.getIndex(addr[0])
-		
+
 		root.next[indx] = innerNode()
 
 		if not previousTrie:
@@ -104,17 +107,17 @@ class StateTrie:
 			fromAddr = t['from']
 
 		root = innerNode()
-		
+
 		StateTrie.traverseTrie(toAddr, t, previousTrie, root)
 		return root
 
-	
+
 	@staticmethod
 	def updateForAllTrans(trans, previousTrie = None):
-		
+		#print (trans)
 		root = None
 		for t in trans:
-			
+
 			root = StateTrie.updateForT(t, previousTrie)
 			previousTrie = root
 
@@ -125,7 +128,7 @@ class StateTrie:
 		if not root:
 			return None
 		if not addr:
-			
+
 			return root.data
 
 		indx = Util.getIndex(addr[0])
@@ -134,7 +137,7 @@ class StateTrie:
 
 
 #For Testing Purpose
-
+'''
 trieRoot = StateTrie()
 
 diseaseId = "abcdefgh1234"
@@ -271,7 +274,8 @@ root1 = trieRoot1.updateForAllTrans (trans, root)
 # print (trieRoot1.getData(tran3['to'], root1))
 # print (trieRoot1.getData(tran4['to'], root1))
 # print (trieRoot1.getData(tran5['to'], root1))
-print (trieRoot1.getData(tran11['to'], root1))
+#print (trieRoot1.getData(tran11['to'], root1))
 # print (trieRoot1.getData(tran21['to'], root1))
 # print (trieRoot1.getData(tran31['to'], root1))
 # print (trieRoot1.getData(tran41['to'], root1))
+'''

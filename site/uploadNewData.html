@@ -34,6 +34,8 @@
       <div class="col s12">
         Hospital ID - HOSP-145621
       </div>
+      <br>
+      <br>
 
       <div class="input-field col s12" style="display: none">
         <input name="from" id="from" value="HOSP-145621" type="text" calss="validate">
@@ -43,7 +45,16 @@
         <input name="to" id="to" type="text" class="validate">
         <label for="to">Document corresponding user ID</label>
       </div>
-      <br>
+
+      <div class="input-field col s12" >
+        <input name="diseaseID" id="diseaseID" type="text" class="validate">
+        <label for="diseaseID">Disease ID</label>
+      </div>
+      
+      <div class="input-field col s12">
+        <textarea name="desc" id="textarea1" class="materialize-textarea"></textarea>
+        <label for="textarea1">Description</label>
+      </div>
 
 
       <div class="file-field input-field col s12">
@@ -92,10 +103,14 @@
 
   $(document).ready(function(){
 
+    const flaskHost = 'http://127.0.0.1:5000/'
+
     $("#form").submit(function (event) {
       event.preventDefault();
 
       var formData = new FormData($(this)[0]);
+      var serialized = $(this).serializeArray();
+
       $.ajax({
           url: 'http://localhost:5000/files/upload',
           type: 'POST',
@@ -106,7 +121,16 @@
           processData: false,
           success: function (data) {
               console.log('Form Submitted!');
-              
+              sendData = {
+                'docLink': flaskHost + 'files/access/' + data.fileName,
+                'hash': data.hash 
+              },
+
+              jQuery.each(serialized, function( i, field ) {
+                sendData[field.name] = field.value;
+              });
+              UploadToBlockChain(sendData)
+              console.log(sendData);
           },
           error: function(err){
               console.log(err);
@@ -119,17 +143,21 @@
   
   });
 
-  function submitUploadedFile(link, to, from, hash) {
-      data = {
-          'to': to,
-          'docLink': link,
-          'from': from,
-          'hash': hash,
-          'diseaseID': diseaseID
-      }
+  function UploadToBlockChain(compiledData) {
       $.ajax({
           url: 'http://localhost:5000/submitRecord',
           type: 'POST',       
+          dataType : "json",
+          contentType: "application/json; charset=utf-8",
+          data : JSON.stringify(compiledData),
+          success: function (suc) {
+              console.log(suc);
+              alert('Data uploaded');
+              window.location = 'http://localhost:3000/success'
+          },
+          error: function(err){
+              console.log(err);
+          }
       });
   }
 </script>

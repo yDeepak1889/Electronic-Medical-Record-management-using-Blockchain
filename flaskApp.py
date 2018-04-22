@@ -1,4 +1,4 @@
-import os, datetime, time
+import os, datetime, time, sys
 from werkzeug.utils import secure_filename
 from blockchain import Blockchain
 from flask import Flask, jsonify, request, send_from_directory
@@ -122,18 +122,19 @@ def uploadFile():
         if 'file' not in request.files:
             response['type'] = 'error'
             response['desc'] = 'No file part'
-            return jsonify(response)
+            return jsonify(response), 400
         file = request.files['file']
         if file.filename is '':
             response['type'] = 'error'
             response['desc'] = 'No file selected'
-            return jsonify(response)
+            return jsonify(response), 400
         fileExtenstion = file.filename.rsplit('.', 1)[1].lower()
+        print(fileExtenstion)
         if not fileExtenstion in allowedExtensions:
             response['type'] = 'error'
             response['desc'] = 'File format not allowed, file extenstions allowed are - ' +\
-                 string.join(allowedExtensions, ', ')
-            return jsonify(response)
+                 ','.join(allowedExtensions)
+            return jsonify(response), 400
 
         # handled Error
         filename = secure_filename(file.filename)
@@ -142,6 +143,7 @@ def uploadFile():
         file.save(os.path.join(os.path.abspath(UPLOAD_FOLDER), savePath))
         response['type'] = 'success'
         response['fileName'] = savePath
+        response['hash'] = Util.get_hash('savePath')
         return jsonify(response), 200
 
     # get is only for testing
@@ -170,6 +172,7 @@ def home():
 
 @app.route('/submitRecord', methods=['POST'])
 def submitRecord():
+
     values = request.get_json(force=True)
     required = ['from', 'to', 'diseaseID', 'docLink', 'hash']
 

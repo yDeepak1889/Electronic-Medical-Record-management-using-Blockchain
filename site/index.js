@@ -14,3 +14,8 @@ router.get('/uploadNewData', function(req, res) {
 	var dir = __dirname;
 	res.sendFile(dir + '/uploadNewData.html');
 });
+
+router.get('/success', function(req, res) {
+	var dir = __dirname;
+	res.sendFile(dir + '/success.html');
+});

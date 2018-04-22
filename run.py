@@ -1,8 +1,8 @@
 import requests
 import json
 
-hostName = 'http://localhost:5001/'
-r = requests.get('http://127.0.0.1:5001/chain')
+hostName = 'http://localhost:5000/'
+r = requests.get('http://127.0.0.1:5000/chain')
 print (r.text)
 
 params = {
@@ -12,6 +12,8 @@ params = {
 	"docLink": "http://www.knsbnksdsdssn.com",
     "hash":"2112312"
 }
+print(params)
+print(json.dumps(params))
 
 r = requests.post(hostName+'submitRecord', data=json.dumps(params))
 print(r.text)

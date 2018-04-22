@@ -62,3 +62,37 @@ params = {
 
 r = requests.post(hostName+'grantAccess', data=json.dumps(params))
 print(r.text)
+
+r = requests.get(hostName+'mine')
+print (r.text)
+
+r = requests.get(hostName+'chain')
+print (r.text)
+
+params = {
+    "addr": "12345abcdefghsh"
+}
+r = requests.post(hostName+'getData', data=json.dumps(params))
+print(r.text)
+
+params = {
+    "from": "12345abcdefghsh",
+    "to": "abcde123456789",
+    "hospitalId": "abcde12345",
+    "diseaseId": "0987654321123456"
+}
+
+r = requests.post(hostName+'revokeAccess', data=json.dumps(params))
+print(r.text)
+
+r = requests.get(hostName+'mine')
+print (r.text)
+
+r = requests.get(hostName+'chain')
+print (r.text)
+
+params = {
+    "addr": "12345abcdefghsh"
+}
+r = requests.post(hostName+'getData', data=json.dumps(params))
+print(r.text)

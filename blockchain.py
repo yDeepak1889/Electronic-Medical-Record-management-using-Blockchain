@@ -83,7 +83,7 @@ class Blockchain(object):
             'type': type_,
             'info': info
         })
-        print (info)
+        #print (info)
         return self.lastBlock[0]['index'] + 1
 
     @staticmethod
@@ -150,27 +150,28 @@ class Blockchain(object):
 
         return False
 
-    def submitRecordTransaction(self, from_, to_, diseaseId, docLink):
+    def submitRecordTransaction(self, from_, to_, diseaseId, docLink, hash_):
         hashOfDoc = Util.get_hash(docLink) #update this to get hash of original doc
         type_ = 0
         info = {
             'diseaseId' : diseaseId,
             'docLink': docLink,
-            'permmissions' : [from_]
+            'permmissions' : from_,
+            'hash': hash_
         }
-        return self.newTransaction(Util.get_hash(from_)[30:], Util.get_hash(to_)[30:], type_, info)
+        return self.newTransaction(from_, to_, type_, info)
 
     def grantRevokeAccessTransaction(self, from_, to_, hospitalId, diseaseId, type_=1):
         lastBlk = self.lastBlock
         stateTrie = lastBlk[1]['stateTrieRoot']
 
         dataBlock = StateTrie.getData(from_, stateTrie)
-        print (dataBlock)
+        #print (dataBlock)
         if not dataBlock:
             return False
 
         if hospitalId in dataBlock:
-            if not diseaseId in dataBlock['hospitalId']:
+            if not diseaseId in dataBlock[hospitalId]:
                 return False
         else:
             return False
@@ -180,5 +181,18 @@ class Blockchain(object):
             'diseaseId': diseaseId
         }
 
-        print (info)
+        #print (info)
         return self.newTransaction(from_, to_, type_, info)
+
+
+    def getPatientData(self, addr):
+        lastBlk = self.lastBlock
+        stateTrie = lastBlk[1]['stateTrieRoot']
+
+        dataBlock = StateTrie.getData(addr, stateTrie)
+        
+        if not dataBlock:
+            return {'No Record Exists'}
+
+        return dataBlock
+

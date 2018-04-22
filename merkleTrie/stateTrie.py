@@ -47,13 +47,15 @@ class StateTrie:
 			if type_ == 0:
 				dataToUpdate = {
 				tran['info']['diseaseId']: {
-						tran['info']['docLink']: tran['info']['permmissions']
+						"docs": [{"link":tran['info']['docLink'], "hash":tran['info']['hash']}],
+						"permmissions": [tran['info']['permmissions']]
 					}
 				}
 				if root.next[indx].data:
 					if tran['from'] in root.next[indx].data:
 						if tran['info']['diseaseId'] in root.next[indx].data[tran['from']]:
-							root.next[indx].data[tran['from']][tran['info']['diseaseId']][tran['info']['docLink']] = tran['info']['permmissions']
+							root.next[indx].data[tran['from']][tran['info']['diseaseId']][tran['info']['docs']].append({"link":tran['info']['docLink'], "hash":tran['info']['hash']})
+							root.next[indx].data[tran['from']][tran['info']['diseaseId']][tran['info']['permmissions']].append(tran['info']['permmissions'])
 						else:
 							root.next[indx].data[tran['from']] = dataToUpdate
 					else:
@@ -65,10 +67,11 @@ class StateTrie:
 					}
 			#Patient grants permmission to new hospital to access data of specified hospitalId and diseadeId
 			elif type_ == 1:
-				root.next[indx].data[tran['hospitalId']][tran['diseaseId']].append(tran['to'])
+				root.next[indx].data[tran['info']['hospitalId']][tran['info']['diseaseId']]['permmissions'].append(tran['to'])
 
 			elif type_ == 2:
-				root.next[indx].data[tran['hospitalId']][tran['diseaseId']].remove(tran['to'])
+				if tran['to'] in root.next[indx].data[tran['info']['hospitalId']][tran['info']['diseaseId']]['permmissions']:
+					root.next[indx].data[tran['info']['hospitalId']][tran['info']['diseaseId']]['permmissions'].remove(tran['to'])
 
 
 

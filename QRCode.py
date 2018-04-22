@@ -1,13 +1,12 @@
 import pyqrcode
-import qrtools
+from qrtools.qrtools import QR
 
 class QRCode(object):
 
 	def decodeQR(self, img):
-		qr = qrtools.QR()
-		qr.decode(img)
-
-		print(qr.data)
+		qr = QR(filename = 'QRCode1.png')
+		qr.decode()
+		print qr.data 
 
 
 c = QRCode()

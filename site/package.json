@@ -1,0 +1,22 @@
+{
+  "name": "healthy-blockchain",
+  "version": "1.0.0",
+  "description": "'Blockchain'ing Medical Records for greater security and accessibility.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yDeepak1889/Blockchain_.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yDeepak1889/Blockchain_/issues"
+  },
+  "homepage": "https://github.com/yDeepak1889/Blockchain_#readme",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}

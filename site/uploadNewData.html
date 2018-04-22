@@ -27,7 +27,7 @@
     </nav>
 
 
-  <form action="http://localhost:3000/org/upload/tender"  method="post" enctype="multipart/form-data">
+  <form id='form' method="post" enctype="multipart/form-data">
     <div class="row" style="width:70vw">
       <h1>Upload Data</h1>
 
@@ -51,13 +51,16 @@
         <br>
         <div class="btn">
           <span>File</span>
-          <input class="filetoupload" name="filetoupload" type="file">
+          <input id="filetoupload" class="filetoupload" name="file" type="file">
         </div>
         <div class="file-path-wrapper">
           <input class="file-path validate" type="text">
         </div>
 
       </div>
+      <br>
+      <button class="btn waves-effect waves-light s12 col" type="submit">Submit Document 
+
     </div>
   </form>
 
@@ -88,15 +91,47 @@
 <script>
 
   $(document).ready(function(){
-    $('.datepicker').pickadate({
-        min: new Date(),
-        selectMonths: true, // Creates a dropdown to control month
-        selectYears: 15, // Creates a dropdown of 15 years to control year
-        firstDay: 1
+
+    $("#form").submit(function (event) {
+      event.preventDefault();
+
+      var formData = new FormData($(this)[0]);
+      $.ajax({
+          url: 'http://localhost:5000/files/upload',
+          type: 'POST',
+          data: formData,
+          async: false,
+          cache: false,
+          contentType: false,
+          processData: false,
+          success: function (data) {
+              console.log('Form Submitted!');
+              
+          },
+          error: function(err){
+              console.log(err);
+              alert(err.desc);
+          }
       });
-    
-    $('select').material_select();
- });
+
+      return false;
+    });
+  
+  });
+
+  function submitUploadedFile(link, to, from, hash) {
+      data = {
+          'to': to,
+          'docLink': link,
+          'from': from,
+          'hash': hash,
+          'diseaseID': diseaseID
+      }
+      $.ajax({
+          url: 'http://localhost:5000/submitRecord',
+          type: 'POST',       
+      });
+  }
 </script>
   </body>
 </html>

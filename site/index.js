@@ -8,7 +8,7 @@ var server = app.listen(port, function() {
 	console.log('Express server listening on port ' + port);
 });
 
-app.use('/test', router);
+app.use('/', router);
 
 router.get('/uploadNewData', function(req, res) {
 	var dir = __dirname;
@@ -18,4 +18,9 @@ router.get('/uploadNewData', function(req, res) {
 router.get('/success', function(req, res) {
 	var dir = __dirname;
 	res.sendFile(dir + '/success.html');
+});
+
+router.get('/explorer', function(req, res) {
+	var dir = __dirname;
+	res.sendFile(dir + '/explorer.html');
 });

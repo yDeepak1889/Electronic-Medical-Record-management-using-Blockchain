@@ -104,6 +104,11 @@ class Blockchain(object):
         return hashlib.sha256(blockString).hexdigest()
 
     @property
+    def currentList(self):
+        print(self.currentTransaction)
+        return self.currentTransaction
+
+    @property
     def lastBlock(self):
         return self.chain[-1]
 

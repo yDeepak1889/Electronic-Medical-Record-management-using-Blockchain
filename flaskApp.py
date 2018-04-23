@@ -71,6 +71,10 @@ def fullChain():
     }
     return jsonify(response), 200
 
+@app.route('/unMinedTransactions', methods=['GET'])
+def unMinedTransactions():
+    return jsonify(Blockchain.currentList), 200
+
 
 @app.route('/nodes/register', methods=['POST'])
 def registerNodes():
@@ -175,6 +179,7 @@ def submitRecord():
 
     values = request.get_json(force=True)
     required = ['from', 'to', 'diseaseID', 'docLink', 'hash']
+    print (values)
 
     if not all(k in values for k in required):
         return "Missing values", 400

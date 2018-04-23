@@ -147,7 +147,6 @@
       $.ajax({
           url: 'http://localhost:5000/submitRecord',
           type: 'POST',       
-          dataType : "json",
           contentType: "application/json; charset=utf-8",
           data : JSON.stringify(compiledData),
           success: function (suc) {

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Explore the Chain</title>
+  
+  </head>
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+ <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script> 
+     <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+
+
+
+  <body>
+    <nav>
+      <div class="nav-wrapper">
+        <div class="container">
+          <a href="#" class="brand-logo">Healthy BlockChain</a>
+          <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <li><a href="#">Explore blocks</a></li>
+            <li><a href="#">Permissions</a></li>
+            <li><a href="#">Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="row">
+
+      <div class="col s3 grey">
+        <span class="flow-text">Pending Transactions</span>
+      </div>
+
+      <div class="col s9">
+        <h3 class="flow-text grey-text text-darken-4">Mined Blocks</h3>
+        <div>
+          <ul class="collapsible" id="allBlocks">
+            
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+
+    <footer class="page-footer">
+      <div class="container">
+        <div class="row">
+          <div class="col l6 s12">
+            <h5 class="white-text">About</h5>
+            <p class="grey-text text-lighten-4">'Blockchain'ing Medical Records for greater security and accessibility.</p>
+          </div>
+          <div class="col l4 offset-l2 s12">
+            <h5 class="white-text">Technologies</h5>
+            <ul>
+              <li><a class="grey-text text-lighten-3" href="#">Blockchain</a></li>
+              <li><a class="grey-text text-lighten-3" href="#">Django</a></li>
+              <li><a class="grey-text text-lighten-3" href="#">NodeJs</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-copyright">
+        <div class="container">
+          Made with <img src="./images/heart.svg" height="12px"> by 
+          <a class="grey-text text-lighten-4 " href="https://github.com/Vim-jas">Team Vim-Jas</a>
+        </div>
+      </div>
+    </footer>
+<script>
+
+  const flaskHost = 'http://127.0.0.1:5000/'
+  var elem = document.querySelector('.collapsible');
+
+  $(document).ready(function(){
+    $('.collapsible').collapsible();
+    M.AutoInit();
+  
+    $.ajax({
+      url: 'http://localhost:5000/chain',
+      type: 'GET',
+      success: function (res) {
+        console.log(res['chain']);
+        updateChain(res['chain']);
+        $(".collapsible").collapsible()
+      }
+    })
+  });
+
+  function updateChain(chain) {
+    for (var i = 0; i < chain.length; i++) {
+      makeBlock(i, chain[i])
+    }
+  }
+
+  function makeBlock(key, aBlock) {
+    var blk = $(document.createElement('li'));
+    var blkHeader = $(document.createElement('div'))
+                        .addClass('collapsible-header')
+                        .append( $(document.createElement('i'))
+                                      .addClass('material-icons')
+                                      .text('filter_drama')
+                          )
+                          .append( $(document.createElement('span'))
+                                      .text('Block No. ' + key)
+                          );
+    var makeTransactions = convertTransactions(aBlock['transactions']);
+    
+    if (makeTransactions.length != 0) { 
+      var TransactionHolder = $(document.createElement('ul'))
+                                .addClass('collapsible');
+      makeTransactions.forEach(function(oneTrans) {
+        TransactionHolder.append(oneTrans);
+      });
+      $('.collapsible').collapsible(TransactionHolder);
+    }
+    else
+      var TransactionHolder = $(document.createElement('span'))
+                                .text('No Transactions in this block');
+    var blkBody = $(document.createElement('div'))
+                        .addClass('collapsible-body')
+                        .append( $(document.createElement('span'))
+                                      .html(TransactionHolder)
+                          );
+
+    blk.append(blkHeader)
+       .append(blkBody);
+    $('#allBlocks').append(blk);
+  }
+
+  function convertTransactions(allTrans) {
+    htmlTrans = [];
+
+    for (var i = 0; i < allTrans.length; i++) {
+      var trnsHeader = $(document.createElement('div'))
+                          .addClass('collapsible-header')
+                          .append( $(document.createElement('i'))
+                                        .addClass('material-icons')
+                                        .text('filter_drama')
+                            )
+                          .append( $(document.createElement('span'))
+                                        .text('Transaction No. ' + i)
+                            );
+      var table = $(document.createElement('table'));
+      table.append($(document.createElement('tr'))
+                      .append($(document.createElement('td'))
+                                .text('From'))
+                      .append($(document.createElement('td'))
+                                .text(allTrans[i]['from']))
+                      );
+      table.append($(document.createElement('tr'))
+                      .append($(document.createElement('td'))
+                                .text('To'))
+                      .append($(document.createElement('td'))
+                                .text(allTrans[i]['to']))
+                      );
+      $.each(allTrans[i]['info'], function(k, v) {
+        table.append($(document.createElement('tr'))
+                      .append($(document.createElement('td'))
+                                .text(k))
+                      .append($(document.createElement('td'))
+                                .text(v)));  
+      });
+      var trnsBody = $(document.createElement('div'))
+                    .addClass('collapsible-body')
+                    .append($(document.createElement('span'))
+                      .html(table)
+                    );
+      var trns = $(document.createElement('li'))
+                    .append(trnsHeader)
+                    .append(trnsBody);
+      htmlTrans.push(trns);
+    }
+    
+    return htmlTrans;
+  }
+
+</script>
+  </body>
+</html>

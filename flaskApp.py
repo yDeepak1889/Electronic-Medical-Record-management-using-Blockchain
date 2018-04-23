@@ -1,4 +1,4 @@
-import os, datetime, time, sys
+import os, datetime, time, sys, json
 from werkzeug.utils import secure_filename
 from blockchain import Blockchain
 from flask import Flask, jsonify, request, send_from_directory
@@ -73,7 +73,10 @@ def fullChain():
 
 @app.route('/unMinedTransactions', methods=['GET'])
 def unMinedTransactions():
-    return jsonify(Blockchain.currentList), 200
+    print('unMinedTransactions')
+    print(blockchain.currentTransaction)
+    print(json.dumps(blockchain.currentTransaction))
+    return json.dumps(blockchain.currentTransaction), 200
 
 
 @app.route('/nodes/register', methods=['POST'])

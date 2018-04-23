@@ -11,7 +11,11 @@
 
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
-
+<style type="text/css">
+.collapsible-header, .collapsible-body{
+  overflow-x: auto;
+}
+</style>
 
 
   <body>
@@ -30,17 +34,38 @@
 
     <div class="row">
 
-      <div class="col s3 grey">
-        <span class="flow-text">Pending Transactions</span>
+      <div class="col s4">
+        <h3 class="flow-text grey-text text-darken-4">Pending Transactions</h3>
+        <div >
+          <div id="unMinedPar">
+            
+          </div>
+          <ul class="collapsible" id="unMined">
+            
+          </ul>
+        </div>
       </div>
 
-      <div class="col s9">
+      <div class="col s6">
         <h3 class="flow-text grey-text text-darken-4">Mined Blocks</h3>
         <div>
           <ul class="collapsible" id="allBlocks">
             
           </ul>
         </div>
+      </div>
+
+      <div class="col s2">
+        <h3 class="flow-text grey-text text-darken-4">Options</h3>
+        <button onclick="mine()" class="btn waves-effect waves-light col flow-text s12">
+          Mine New Blocks
+        </button>
+        <br>
+        <br>
+
+        <button onclick="refresh()" class="btn waves-effect waves-light col s12">
+          Refresh Block List
+        </button>
       </div>
 
     </div>
@@ -76,9 +101,11 @@
   var elem = document.querySelector('.collapsible');
 
   $(document).ready(function(){
-    $('.collapsible').collapsible();
     M.AutoInit();
-  
+    fillHtml();
+  });
+
+  function fillHtml() {
     $.ajax({
       url: 'http://localhost:5000/chain',
       type: 'GET',
@@ -87,8 +114,91 @@
         updateChain(res['chain']);
         $(".collapsible").collapsible()
       }
+
     })
-  });
+
+    $.ajax({
+      url: 'http://localhost:5000/unMinedTransactions',
+      type: 'GET',
+      success: function (res) {
+        console.log(JSON.parse(res));
+        updateUnMined(JSON.parse(res));
+      }
+    })
+    
+    $(".collapsible").collapsible()
+  }
+
+  function mine() {
+    console.log('mine called');
+    $.ajax({
+      url: 'http://localhost:5000/mine',
+      type: 'GET',
+      success: function (res) {
+        console.log(res);
+      }
+    })
+    refresh();
+  }
+
+  function refresh() {
+    $('#unMined').empty();
+    $('#unMined').hide();
+    $('#unMinedPar').text('No Pending Transaction');
+    $('#allBlocks').empty();
+    fillHtml();
+  }
+
+  function updateUnMined(res) {
+    if (res.length == 0) {
+      $('#unMinedPar').append($(document.createElement('span'))
+        .text('No Pending Transaction'))
+      $('#unMined').hide()
+    }
+    for (var i = 0; i < res.length; i++) {
+      $('#unMined').show()
+      var trnsHeader = $(document.createElement('div'))
+                    .addClass('collapsible-header')
+                    .append( $(document.createElement('i'))
+                                  .addClass('material-icons')
+                                  .text('filter_drama')
+                      )
+                    .append( $(document.createElement('span'))
+                                  .text('Pending Transaction No. ' + i)
+                      );
+      
+      var table = $(document.createElement('table'));
+      table.append($(document.createElement('tr'))
+                      .append($(document.createElement('td'))
+                                .text('From'))
+                      .append($(document.createElement('td'))
+                                .text(res[i]['from']))
+                      );
+      table.append($(document.createElement('tr'))
+                      .append($(document.createElement('td'))
+                                .text('To'))
+                      .append($(document.createElement('td'))
+                                .text(res[i]['to']))
+                      );
+      $.each(res[i]['info'], function(k, v) {
+        table.append($(document.createElement('tr'))
+                      .append($(document.createElement('td'))
+                                .text(k))
+                      .append($(document.createElement('td'))
+                                .text(v)));  
+      });
+      var trnsBody = $(document.createElement('div'))
+                    .addClass('collapsible-body')
+                    .append($(document.createElement('span'))
+                      .html(table)
+                    );
+      var trns = $(document.createElement('li'))
+                    .append(trnsHeader)
+                    .append(trnsBody);
+
+      $('#unMined').append(trns);
+    }
+  }
 
   function updateChain(chain) {
     for (var i = 0; i < chain.length; i++) {

@@ -1,4 +1,5 @@
 import requests
+from flask import jsonify
 import json
 
 hostName = 'http://localhost:5000/'
@@ -40,6 +41,51 @@ params = {
 
 r = requests.get(hostName+'mine')
 print(r.text)
+
+
+params = {
+    "from": "12345abcde",
+    "to": "abcde123456789",
+    "hospitalId": "abcde12345",
+    "diseaseId": "0987654321123456"
+}
+
+r = requests.post(hostName+'grantAccess', data=json.dumps(params))
+print(r.text)
+
+r = requests.get(hostName+'mine')
+print(r.text)
+
+params = {
+    "addr": "12345abcde",
+	"isP": True
+}
+r = requests.post(hostName+'getData', data=json.dumps(params))
+print(r.text)
+
+params = {
+	"from": "abcde123456789",
+    "to": "abcde12345",
+    "patientId": "12345abcde",
+    "diseaseId": "0987654321123456"
+}
+
+r = requests.post(hostName+'getKey', data=json.dumps(params))
+s = r.text
+json_acceptable_string = s.replace("'", "\"")
+d = json.loads(json_acceptable_string)
+
+print (type(d))
+
+params = {
+	"key": d['key']
+}
+
+print (params)
+
+r = requests.post(hostName+'getFileLink', data=json.dumps(params))
+
+print (r.text)
 '''
 r = requests.post(hostName+'submitRecord', data=json.dumps(params))
 print(r.text)
@@ -62,15 +108,7 @@ params = {
 r = requests.post(hostName+'getData', data=json.dumps(params))
 print(r.text)
 
-params = {
-    "from": "12345abcdefghsh",
-    "to": "abcde123456789",
-    "hospitalId": "abcde12345",
-    "diseaseId": "0987654321123456"
-}
 
-r = requests.post(hostName+'grantAccess', data=json.dumps(params))
-print(r.text)
 
 r = requests.get(hostName+'mine')
 #print (r.text)

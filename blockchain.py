@@ -8,6 +8,12 @@ import hashlib
 from merkleTrie.stateTrie import *
 from merkleTrie.merkleTrie import *
 from merkleTrie.utils import *
+from Encryption import *
+
+#Global Key
+
+tokenKeyMap = {}
+encryptLinkToLinkMap = {}
 
 
 class Blockchain(object):
@@ -170,9 +176,20 @@ class Blockchain(object):
     def submitRecordTransaction(self, from_, to_, diseaseId, docLink, hash_):
         hashOfDoc = Util.get_hash(docLink) #update this to get hash of original doc
         type_ = 0
+
+        e = Encryption(docLink.encode())
+        
+
+        token, key = e.encrypt()
+        
+        #print(e.decrypt(token, key))
+
+        tokenKeyMap[token.decode()] = key.decode()
+        encryptLinkToLinkMap[key.decode()] = docLink
+
         info = {
             'diseaseId' : diseaseId,
-            'docLink': docLink,
+            'docLink': token.decode(),
             'permmissions' : from_,
             'hash': hash_
         }
@@ -183,7 +200,7 @@ class Blockchain(object):
         stateTrie = lastBlk[1]['patientStateTrieRoot']
 
         dataBlock = StateTrie.getData(from_, stateTrie)
-        #print (dataBlock)
+        ##print (dataBlock)
         if not dataBlock:
             return False
 
@@ -213,6 +230,27 @@ class Blockchain(object):
         dataBlock = StateTrie.getData(addr, stateTrie)
 
         if not dataBlock:
-            return {'No Record Exists'}
+            return {"error":'No Record Exists'}
 
         return dataBlock
+
+
+    def getKey(self, from_, to_, patientId, diseaseId) :
+        print (from_, to_, patientId, diseaseId)
+
+        lastBlk = self.lastBlock
+        stateTrie = lastBlk[1]['patientStateTrieRoot']
+        dataBlock = StateTrie.getData(patientId, stateTrie)
+
+        print (tokenKeyMap)
+         
+        if to_ in dataBlock and diseaseId in dataBlock[to_] and from_ in  dataBlock[to_][diseaseId]['permmissions']:
+            return {"key": tokenKeyMap[dataBlock[to_][diseaseId]["docs"][0]['link']]}
+
+        return None
+
+    def getFileLink(self, keyMap):
+        
+        #print (encryptLinkToLinkMap)
+        #print (keyMap)
+        return {'link': encryptLinkToLinkMap[keyMap]}

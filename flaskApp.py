@@ -226,8 +226,36 @@ def getPData():
 
     response = blockchain.getData(Util.get_hash(values['addr'])[30:], values['isP']);
 
+    #print (response,"---------------")
+
     return jsonify(response), 200
 
 
+@app.route('/getKey', methods=['POST', 'GET'])
+def getKey():
+    values = request.get_json(force=True)
+
+    required = ['from', 'to', 'patientId', 'diseaseId']
+
+    if not all(k in values for k in required):
+        return "Missing values", 400
+
+    response = blockchain.getKey(Util.get_hash(values['from'])[30:], Util.get_hash(values['to'])[30:], Util.get_hash(values['patientId'])[30:], values['diseaseId'])
+
+    if not response:
+        return "Something went wrong", 400
+
+    return jsonify(response), 200
+
+@app.route('/getFileLink', methods=['POST', 'GET'])
+def getFileLink():
+    values=request.get_json(force=True)
+
+    print (values)
+
+    response = blockchain.getFileLink(values['key'])
+
+    return jsonify(response), 200
+
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5001)
+    app.run(host='127.0.0.1', port=5000)

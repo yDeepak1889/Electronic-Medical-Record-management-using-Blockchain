@@ -32,28 +32,16 @@
       </div>
     </nav>
 
-    <h1 id="message" class="flow-text grey-text text-darken-4">
+    <div id="message">
       
-    </h1>
-    <div id="whitespace" style="display: none">
-      <br><br><br><br><br><br><br>
     </div>
     <div id="formContainer">
-      <form id='form' >
+      <form id='form'>
         <div class="row" style="width:70vw">
-          <h1>Allow Access</h1>
+          <h1>Access Files</h1>
 
           <div class="input-field col s12">
-            <select name="type" >
-              <option value="" disabled selected>Choose your option</option>
-              <option value="1">Grant</option>
-              <option value="2">Revoke</option>
-            </select>
-            <label for="type">Materialize Select</label>
-          </div>
-
-          <div class="input-field col s12">
-            <input name="from" id="from" type="text" class="validate">
+            <input name="from" id="from" type="text" calss="validate">
             <label for="from">From</label>
           </div>
 
@@ -63,8 +51,8 @@
           </div>
 
           <div class="input-field col s12" >
-            <input name="hospitalId" id="hospitalId" type="text" class="validate">
-            <label for="hospitalId">ID of Hospital to share data</label>
+            <input name="patientId" id="patientId" type="text" class="validate">
+            <label for="patientId">Document corresponding user ID</label>
           </div>
 
           <div class="input-field col s12" >
@@ -74,10 +62,28 @@
 
           <br>
           <button class="btn waves-effect waves-light s12 col" type="submit">
-            Grant Access 
+            Get Key 
           </button>
         </div>
       </form>
+      <center>
+        <h4 id="key" class="flow-text grey-text text-darken-4">
+          
+        </h4>
+        <button onclick="accessFile()" id="getLink" class="btn waves-effect waves-light s12 col" type="submit">
+          Get File Link
+        </button>
+        <button onclick="redirect()" id="goToFile" class="btn waves-effect waves-light s12 col" type="submit">
+          Go to File
+          <span id="theLink">
+            
+          </span>        
+        </button>
+
+      </center>
+      <br>
+      <br>
+      <br>
     </div>
 
 
@@ -106,28 +112,46 @@
       </div>
     </footer>
 <script>
-
   const flaskHost = 'http://127.0.0.1:5000/'
-
+  var keey, liink;
   $(document).ready(function(){
     M.AutoInit();
+    $('#key').hide();
+    $('#getLink').hide();
+    $('#goToFile').hide();
   });
+
+  function accessFile() {
+    $.ajax({
+      url: 'http://localhost:5000/getFileLink',
+      type: 'POST',
+      async: false,
+      cache: false,
+      data: {'key': keey},
+      success: function(data) {
+        console.log(data);
+        $('#goToFile').text(data['link']);
+        liink = data['link'];
+        $('#goToFile').show();
+      },
+      error: function(err) {
+        console.log(err);
+      }
+    });
+  };
+
+  function redirect() {
+    window.location = liink;
+  };
 
   $("#form").submit(function (event) {
       event.preventDefault();
 
       var serialized = $(this).serializeArray();
       var formData = new FormData($(this)[0]);
-      var type = serialized[0].value;
-      if (type == 1) {
-          URL = 'http://localhost:5000/grantAccess';
-      }
-      else {
-          URL = 'http://localhost:5000/revokeAccess';
-      }
 
       $.ajax({
-          url: URL,
+          url: 'http://localhost:5000/getKey',
           type: 'POST',
           data: formData,
           async: false,
@@ -136,9 +160,13 @@
           processData: false,
           success: function (data) {
               console.log('Form Submitted!', data);
-              $('#formContainer').empty();
-              $('#message').text(data);
-              $('#whitespace').show();
+              // data = JSON.parse(data);
+              // $('#formContainer').empty();
+              keey = data['key'];
+              $('#key').text('Key: ' + data['key']);
+              $('#key').show()
+              $('#getLink').show();
+              // $('#whitespace').show();
           },
           error: function(err){
               console.log(err);
@@ -146,28 +174,6 @@
           }
       });
     });
-
-  // $('#form').submit( function(e) {
-  //   console.log(e);
-  //   e.preventDefault();
-  //   var formData = new FormData($(this)[0]);
-
-
-  //   $.ajax({
-  //     url: 'http://localhost:5000/grantAccess',
-  //     type: 'GET',
-  //     data: formData,
-  //     success: function (res) {
-  //       console.log(res);
-  //       $('#formContainer').empty();
-  //       $('#message').text('Permmission Granted');
-  //     },
-  //     error: function (err) {
-  //       console.log(err);
-  //     }
-  //   });
-
-  // });
 
 
 

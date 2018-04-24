@@ -216,7 +216,8 @@ class Blockchain(object):
         }
 
         #print (info)
-        return self.newTransaction(from_, to_, type_, info)
+        self.newTransaction(from_, to_, type_, info)
+        return True
 
 
     def getData(self, addr, isP=False):

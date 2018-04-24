@@ -181,6 +181,7 @@ def home():
 def submitRecord():
 
     values = request.get_json(force=True)
+    print(values)
     required = ['from', 'to', 'diseaseID', 'docLink', 'hash']
     print (values)
 
@@ -193,25 +194,36 @@ def submitRecord():
 
 @app.route('/grantAccess', methods=['POST'])
 def grantAccess():
-    values = request.get_json(force=True)
     required = ['from', 'to', 'hospitalId', 'diseaseId']
-    #print (values)
+
+    try:
+        values = request.get_json(force=True)
+        pass
+    except Exception as e:
+        values = {}
+        for key in required:
+            values[key] = request.form.get(key)
+        
+    print(values)
     if not all(k in values for k in required):
         return "Missing values", 400
 
-    blockchain.grantRevokeAccessTransaction(Util.get_hash(values['from'])[30:], Util.get_hash(values['to'])[30:], Util.get_hash(values['hospitalId'])[30:], values['diseaseId'])
-    return "Permmission Granted", 200
+    ret = blockchain.grantRevokeAccessTransaction(Util.get_hash(values['from'])[30:], Util.get_hash(values['to'])[30:], Util.get_hash(values['hospitalId'])[30:], values['diseaseId'])
+    if (ret == True):
+        return "Permmission Granted", 200
+    else:
+        return "Invalid Arguments", 200
 
 
 @app.route('/revokeAccess',  methods=['POST'])
 def revokeAccess():
-    values = request.get_json(force=True)
+    values = request.form.to_dict(flat=False)
     required = ['from', 'to', 'hospitalId', 'diseaseId']
 
     if not all(k in values for k in required):
         return "Missing values", 400
 
-    blockchain.grantRevokeAccessTransaction(Util.get_hash(values['from'])[30:], Util.get_hash(values['to'])[30:], Util.get_hash(values['hospitalId'])[30:], values['diseaseId'], 2)
+    ret = blockchain.grantRevokeAccessTransaction(Util.get_hash(values['from'])[30:], Util.get_hash(values['to'])[30:], Util.get_hash(values['hospitalId'])[30:], values['diseaseId'], 2)
     return "Permmission revoked", 200
 
 
@@ -233,9 +245,16 @@ def getPData():
 
 @app.route('/getKey', methods=['POST', 'GET'])
 def getKey():
-    values = request.get_json(force=True)
-
     required = ['from', 'to', 'patientId', 'diseaseId']
+
+    try:
+        values = request.get_json(force=True)
+        pass
+    except Exception as e:
+        values = {}
+        for key in required:
+            values[key] = request.form.get(key)
+    print(values)
 
     if not all(k in values for k in required):
         return "Missing values", 400
@@ -249,8 +268,13 @@ def getKey():
 
 @app.route('/getFileLink', methods=['POST', 'GET'])
 def getFileLink():
-    values=request.get_json(force=True)
-
+    values = {}
+    try:
+        values = request.get_json(force=True)
+        pass
+    except Exception as e:
+        values['key'] = request.form.get('key')
+    
     print (values)
 
     response = blockchain.getFileLink(values['key'])

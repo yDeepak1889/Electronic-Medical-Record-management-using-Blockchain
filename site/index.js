@@ -24,3 +24,18 @@ router.get('/explorer', function(req, res) {
 	var dir = __dirname;
 	res.sendFile(dir + '/explorer.html');
 });
+
+router.get('/grantAccess', function(req, res) {
+	var dir = __dirname;
+	res.sendFile(dir + '/access_grant.html');
+});
+
+router.get('/fileAccess', function(req, res) {
+	var dir = __dirname;
+	res.sendFile(dir + '/access_file.html');
+});
+
+router.get('/getKey', function(req, res) {
+	var dir = __dirname;
+	res.sendFile(dir + '/access_file.html');
+});

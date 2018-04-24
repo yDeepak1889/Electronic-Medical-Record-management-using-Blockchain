@@ -51,6 +51,7 @@ params = {
 }
 
 r = requests.post(hostName+'grantAccess', data=json.dumps(params))
+
 print(r.text)
 
 r = requests.get(hostName+'mine')

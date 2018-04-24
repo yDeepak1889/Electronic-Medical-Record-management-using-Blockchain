@@ -57,8 +57,9 @@ class StateTrie:
 				if root.next[indx].data:
 					if tran['from'] in root.next[indx].data:
 						if tran['info']['diseaseId'] in root.next[indx].data[tran['from']]:
-							root.next[indx].data[tran['from']][tran['info']['diseaseId']][tran['info']['docs']].append({"link":tran['info']['docLink'], "hash":tran['info']['hash']})
-							root.next[indx].data[tran['from']][tran['info']['diseaseId']][tran['info']['permmissions']].append(tran['info']['permmissions'])
+							print (root.next[indx].data[tran['from']])
+							root.next[indx].data[tran['from']][tran['info']['diseaseId']]["docs"].append({"link":tran['info']['docLink'], "hash":tran['info']['hash']})
+							root.next[indx].data[tran['from']][tran['info']['diseaseId']]["permmissions"].append(tran['info']['permmissions'])
 						else:
 							root.next[indx].data[tran['from']] = dataToUpdate
 					else:

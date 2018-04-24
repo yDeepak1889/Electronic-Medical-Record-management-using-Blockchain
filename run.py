@@ -21,10 +21,10 @@ print(r.text)
 
 params = {
 	"from": "abcde12345",
-	"to": "12345abcdeshdishd",
+	"to": "12345abcde",
 	"diseaseID": "0987654321123456",
-	"docLink": "http://www.knsbnksdsdssn.com",
-    "hash":"2112312"
+	"docLink": "http://www.knsbnksdgfdggsdssn.com",
+    "hash":"211fdfdg2312"
 }
 
 r = requests.post(hostName+'submitRecord', data=json.dumps(params))
@@ -38,6 +38,9 @@ params = {
     "hash":"2112312"
 }
 
+r = requests.get(hostName+'mine')
+print(r.text)
+'''
 r = requests.post(hostName+'submitRecord', data=json.dumps(params))
 print(r.text)
 
@@ -50,9 +53,6 @@ params = {
 }
 r = requests.post(hostName+'submitRecord', data=json.dumps(params))
 print(r.text)
-
-r = requests.get(hostName+'mine')
-#print(r.text)
 
 
 params = {
@@ -115,3 +115,4 @@ params = {
 }
 r = requests.post(hostName+'getData', data=json.dumps(params))
 print(r.text)
+'''

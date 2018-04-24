@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/yDeepak1889/Blockchain_#readme",
   "dependencies": {
-    "express": "^4.16.3"
+    "express": "^4.16.3",
+    "node-rsa": "^0.4.2",
+    "rsa-proxy-reencrypt": "0.0.2"
   }
 }

@@ -144,16 +144,18 @@
   function refresh() {
     $('#unMined').empty();
     $('#unMined').hide();
-    $('#unMinedPar').text('No Pending Transaction');
+    // $('#unMinedPar').text('No Pending Transaction');
     $('#allBlocks').empty();
     fillHtml();
   }
 
   function updateUnMined(res) {
+    $('#unMinedPar').empty();
     if (res.length == 0) {
       $('#unMinedPar').append($(document.createElement('span'))
         .text('No Pending Transaction'))
       $('#unMined').hide()
+      return;
     }
     for (var i = 0; i < res.length; i++) {
       $('#unMined').show()

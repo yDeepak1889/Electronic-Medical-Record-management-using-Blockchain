@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Explore the Chain</title>
+  
+  </head>
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+ <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script> 
+     <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+<style type="text/css">
+.collapsible-header, .collapsible-body{
+  overflow-x: auto;
+}
+</style>
+
+
+  <body>
+    <nav>
+      <div class="nav-wrapper">
+        <div class="container">
+          <a href="#" class="brand-logo">Healthy BlockChain</a>
+          <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <li><a href="#">Explore blocks</a></li>
+            <li><a href="#">Permissions</a></li>
+            <li><a href="#">Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <form id='form' method="post" enctype="multipart/form-data">
+      <div class="row" style="width:70vw">
+        <h1>Upload Data</h1>
+
+        <div class="col s12">
+          Hospital ID - HOSP-145621
+        </div>
+        <br>
+        <br>
+
+        <div class="input-field col s12" style="display: none">
+          <input name="from" id="from" value="HOSP-145621" type="text" calss="validate">
+        </div>
+
+        <div class="input-field col s12" >
+          <input name="to" id="to" type="text" class="validate">
+          <label for="to">Document corresponding user ID</label>
+        </div>
+
+        <div class="input-field col s12" >
+          <input name="diseaseID" id="diseaseID" type="text" class="validate">
+          <label for="diseaseID">Disease ID</label>
+        </div>
+        
+        <div class="input-field col s12">
+          <textarea name="desc" id="textarea1" class="materialize-textarea"></textarea>
+          <label for="textarea1">Description</label>
+        </div>
+
+
+        <div class="file-field input-field col s12">
+          <label class="active" for="filetoupload">Upload Medical Document </label>
+          <br>
+          <div class="btn">
+            <span>File</span>
+            <input id="filetoupload" class="filetoupload" name="file" type="file">
+          </div>
+          <div class="file-path-wrapper">
+            <input class="file-path validate" type="text">
+          </div>
+
+        </div>
+        <br>
+        <button class="btn waves-effect waves-light s12 col" type="submit">Submit Document 
+
+      </div>
+    </form>
+
+
+    <footer class="page-footer">
+      <div class="container">
+        <div class="row">
+          <div class="col l6 s12">
+            <h5 class="white-text">About</h5>
+            <p class="grey-text text-lighten-4">'Blockchain'ing Medical Records for greater security and accessibility.</p>
+          </div>
+          <div class="col l4 offset-l2 s12">
+            <h5 class="white-text">Technologies</h5>
+            <ul>
+              <li><a class="grey-text text-lighten-3" href="#">Blockchain</a></li>
+              <li><a class="grey-text text-lighten-3" href="#">Django</a></li>
+              <li><a class="grey-text text-lighten-3" href="#">NodeJs</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-copyright">
+        <div class="container">
+          Made with <img src="./images/heart.svg" height="12px"> by 
+          <a class="grey-text text-lighten-4 " href="https://github.com/Vim-jas">Team Vim-Jas</a>
+        </div>
+      </div>
+    </footer>
+<script>
+
+  const flaskHost = 'http://127.0.0.1:5000/'
+
+  $(document).ready(function(){
+    M.AutoInit();
+  });
+
+
+</script>
+  </body>
+</html>

@@ -121,7 +121,7 @@ def consensus():
 
 @app.route('/files/upload', methods=['POST', 'GET'])
 def uploadFile():
-    allowedExtensions = set(['txt', 'csv', 'jpg', 'jpeg', 'pdf'])
+    allowedExtensions = set(['txt', 'csv', 'jpg', 'jpeg', 'pdf', 'xsd', 'xml'])
 
     if request.method == 'POST':
         response = {}

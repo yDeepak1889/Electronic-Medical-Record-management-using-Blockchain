@@ -98,7 +98,13 @@
 <script>
 
   const flaskHost = 'http://127.0.0.1:5000/'
-  var elem = document.querySelector('.collapsible');
+  const transactionType = [
+    'Submit Record',
+    'Grant Access',
+    'Revoke Access',
+    'Get Decryption Key'  
+  ];
+
 
   $(document).ready(function(){
     M.AutoInit();
@@ -170,6 +176,14 @@
                       );
       
       var table = $(document.createElement('table'));
+      console.log(res[i]);
+      table.append($(document.createElement('tr'))
+                      .append($(document.createElement('td'))
+                                .html('<b>Type</b>'))
+                      .append($(document.createElement('td'))
+                                .html('<b>' + transactionType[res[i]['type']] + '</b>'))
+                      );
+      
       table.append($(document.createElement('tr'))
                       .append($(document.createElement('td'))
                                 .text('From'))
@@ -257,6 +271,12 @@
                                         .text('Transaction No. ' + i)
                             );
       var table = $(document.createElement('table'));
+      table.append($(document.createElement('tr'))
+                      .append($(document.createElement('td'))
+                                .html('<b>Type</b>'))
+                      .append($(document.createElement('td'))
+                                .html('<b>' + transactionType[allTrans[i]['type']] + '</b>'))
+                      );
       table.append($(document.createElement('tr'))
                       .append($(document.createElement('td'))
                                 .text('From'))
